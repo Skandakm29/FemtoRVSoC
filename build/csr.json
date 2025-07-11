@@ -1,0 +1,148 @@
+{
+    "csr_bases": {
+        "ctrl": 2181038080,
+        "identifier_mem": 2181040128,
+        "timer0": 2181042176,
+        "uart": 2181044224
+    },
+    "csr_registers": {
+        "ctrl_reset": {
+            "addr": 2181038080,
+            "size": 1,
+            "type": "rw"
+        },
+        "ctrl_scratch": {
+            "addr": 2181038084,
+            "size": 1,
+            "type": "rw"
+        },
+        "ctrl_bus_errors": {
+            "addr": 2181038088,
+            "size": 1,
+            "type": "ro"
+        },
+        "timer0_load": {
+            "addr": 2181042176,
+            "size": 1,
+            "type": "rw"
+        },
+        "timer0_reload": {
+            "addr": 2181042180,
+            "size": 1,
+            "type": "rw"
+        },
+        "timer0_en": {
+            "addr": 2181042184,
+            "size": 1,
+            "type": "rw"
+        },
+        "timer0_update_value": {
+            "addr": 2181042188,
+            "size": 1,
+            "type": "rw"
+        },
+        "timer0_value": {
+            "addr": 2181042192,
+            "size": 1,
+            "type": "ro"
+        },
+        "timer0_ev_status": {
+            "addr": 2181042196,
+            "size": 1,
+            "type": "ro"
+        },
+        "timer0_ev_pending": {
+            "addr": 2181042200,
+            "size": 1,
+            "type": "rw"
+        },
+        "timer0_ev_enable": {
+            "addr": 2181042204,
+            "size": 1,
+            "type": "rw"
+        },
+        "uart_rxtx": {
+            "addr": 2181044224,
+            "size": 1,
+            "type": "rw"
+        },
+        "uart_txfull": {
+            "addr": 2181044228,
+            "size": 1,
+            "type": "ro"
+        },
+        "uart_rxempty": {
+            "addr": 2181044232,
+            "size": 1,
+            "type": "ro"
+        },
+        "uart_ev_status": {
+            "addr": 2181044236,
+            "size": 1,
+            "type": "ro"
+        },
+        "uart_ev_pending": {
+            "addr": 2181044240,
+            "size": 1,
+            "type": "rw"
+        },
+        "uart_ev_enable": {
+            "addr": 2181044244,
+            "size": 1,
+            "type": "rw"
+        },
+        "uart_txempty": {
+            "addr": 2181044248,
+            "size": 1,
+            "type": "ro"
+        },
+        "uart_rxfull": {
+            "addr": 2181044252,
+            "size": 1,
+            "type": "ro"
+        }
+    },
+    "constants": {
+        "config_platform_name": "lattice_ice40up5k_evn",
+        "config_clock_frequency": 12000000,
+        "config_cpu_reset_addr": 0,
+        "config_cpu_type_serv": null,
+        "config_cpu_variant_standard": null,
+        "config_cpu_family": "riscv",
+        "config_cpu_name": "serv",
+        "config_cpu_human_name": "serv",
+        "config_cpu_nop": "nop",
+        "config_rom_init": 1,
+        "config_bios_no_build_time": null,
+        "config_identifier": "minimal serv soc - vsd mini",
+        "uart_polling": null,
+        "config_csr_data_width": 32,
+        "config_csr_alignment": 32,
+        "config_bus_standard": "wishbone",
+        "config_bus_data_width": 32,
+        "config_bus_address_width": 32,
+        "config_bus_bursting": 0
+    },
+    "memories": {
+        "rom": {
+            "base": 0,
+            "size": 14208,
+            "type": "cached"
+        },
+        "sram": {
+            "base": 16777216,
+            "size": 8192,
+            "type": "cached"
+        },
+        "main_ram": {
+            "base": 1073741824,
+            "size": 64,
+            "type": "cached"
+        },
+        "csr": {
+            "base": 2181038080,
+            "size": 65536,
+            "type": "io"
+        }
+    }
+}
