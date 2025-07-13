@@ -1,0 +1,3 @@
+set_io  clk12 20
+set_io  serial_tx 14
+set_io  serial_rx 15

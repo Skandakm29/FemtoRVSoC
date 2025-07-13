@@ -9,11 +9,11 @@ CPUENDIANNESS=little
 CLANG=0
 CPU_DIRECTORY=/home/skanda/litex/litex/soc/cores/cpu/serv
 SOC_DIRECTORY=/home/skanda/litex/litex/soc
-PICOLIBC_DIRECTORY=/home/skanda/.local/lib/python3.10/site-packages/pythondata_software_picolibc/data
+PICOLIBC_DIRECTORY=/home/skanda/pythondata-software-picolibc/pythondata_software_picolibc/data
 PICOLIBC_FORMAT=integer
-COMPILER_RT_DIRECTORY=/home/skanda/.local/lib/python3.10/site-packages/pythondata_software_compiler_rt/data
+COMPILER_RT_DIRECTORY=/home/skanda/pythondata-software-compiler_rt/pythondata_software_compiler_rt/data
 export BUILDINC_DIRECTORY
-BUILDINC_DIRECTORY=/home/skanda/soc_python/build/software/include
+BUILDINC_DIRECTORY=/home/skanda/picoEdgeSoC/build/software/include
 LIBC_DIRECTORY=/home/skanda/litex/litex/soc/software/libc
 LIBCOMPILER_RT_DIRECTORY=/home/skanda/litex/litex/soc/software/libcompiler_rt
 LIBBASE_DIRECTORY=/home/skanda/litex/litex/soc/software/libbase

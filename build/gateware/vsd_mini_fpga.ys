@@ -1,0 +1,25 @@
+verilog_defaults -push
+verilog_defaults -add -defer
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_bufreg2.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_compdec.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_decode.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_mem_if.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_alu.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_csr.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_top.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_bufreg.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_aligner.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_rf_top.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_immdec.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_synth_wrapper.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_ctrl.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_rf_ram.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_rf_ram_if.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_state.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl/serv_rf_if.v
+read_verilog -I/home/skanda/pythondata-cpu-serv/pythondata_cpu_serv/verilog/rtl /home/skanda/picoEdgeSoC/build/gateware/vsd_mini_fpga.v
+verilog_defaults -pop
+attrmap -tocase keep -imap keep="true" keep=1 -imap keep="false" keep=0 -remove keep=0
+
+synth_ice40 -dsp -top vsd_mini_fpga
+write_json  vsd_mini_fpga.json

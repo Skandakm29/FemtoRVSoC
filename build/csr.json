@@ -103,7 +103,7 @@
         }
     },
     "constants": {
-        "config_platform_name": "lattice_ice40up5k_evn",
+        "config_platform_name": "vsd_mini_fpga",
         "config_clock_frequency": 12000000,
         "config_cpu_reset_addr": 0,
         "config_cpu_type_serv": null,
@@ -114,7 +114,7 @@
         "config_cpu_nop": "nop",
         "config_rom_init": 1,
         "config_bios_no_build_time": null,
-        "config_identifier": "minimal serv soc - vsd mini",
+        "config_identifier": "minimal serv soc - rom only",
         "uart_polling": null,
         "config_csr_data_width": 32,
         "config_csr_alignment": 32,
@@ -132,11 +132,6 @@
         "sram": {
             "base": 16777216,
             "size": 8192,
-            "type": "cached"
-        },
-        "main_ram": {
-            "base": 1073741824,
-            "size": 64,
             "type": "cached"
         },
         "csr": {
