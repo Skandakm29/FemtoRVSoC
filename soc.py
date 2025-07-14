@@ -6,7 +6,7 @@ from litex.gen import *
 from platforms import vsd_mini_fpga  # Your board platform
 from litex.soc.integration.soc_core import SoCMini
 from litex.soc.integration.builder import Builder
-from litex.soc.cores.gpio import GPIOOut  # ✅ Import GPIO
+from litex.soc.cores.gpio import GPIOOut  # 
 from litex.soc.cores import uart
 
 #  Clock Reset Generator
@@ -35,9 +35,9 @@ class MinimalFemtoRVSoC(SoCMini):
             integrated_main_ram_size=0,  # No RAM
         )
 
-        self.add_uart(name="serial")  # ✅ Add UART for console prints
+        self.add_uart(name="serial")  #  Add UART for console prints
 
-        # ✅ Add RGB LEDs as GPIO Outputs
+        #  Add RGB LEDs as GPIO Outputs
         led_pads = [
             platform.request("led_red"),
             platform.request("led_green"),
@@ -46,7 +46,7 @@ class MinimalFemtoRVSoC(SoCMini):
         self.submodules.leds = GPIOOut(Cat(*led_pads))  # Create GPIO from list
         self.add_csr("leds")  # Expose CSR for firmware control
 
-# 🔨 Build Entry
+#  Build Entry
 def main():
     soc = MinimalFemtoRVSoC()
     builder = Builder(soc,
