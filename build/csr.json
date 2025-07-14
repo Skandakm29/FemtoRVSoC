@@ -1,61 +1,67 @@
 {
     "csr_bases": {
-        "ctrl": 2181038080,
-        "uart": 2181040128
+        "leds": 2181038080,
+        "ctrl": 2181040128,
+        "serial": 2181042176
     },
     "csr_registers": {
-        "ctrl_reset": {
+        "leds_out": {
             "addr": 2181038080,
             "size": 1,
             "type": "rw"
         },
-        "ctrl_scratch": {
-            "addr": 2181038084,
-            "size": 1,
-            "type": "rw"
-        },
-        "ctrl_bus_errors": {
-            "addr": 2181038088,
-            "size": 1,
-            "type": "ro"
-        },
-        "uart_rxtx": {
+        "ctrl_reset": {
             "addr": 2181040128,
             "size": 1,
             "type": "rw"
         },
-        "uart_txfull": {
+        "ctrl_scratch": {
             "addr": 2181040132,
             "size": 1,
-            "type": "ro"
+            "type": "rw"
         },
-        "uart_rxempty": {
+        "ctrl_bus_errors": {
             "addr": 2181040136,
             "size": 1,
             "type": "ro"
         },
-        "uart_ev_status": {
-            "addr": 2181040140,
-            "size": 1,
-            "type": "ro"
-        },
-        "uart_ev_pending": {
-            "addr": 2181040144,
+        "serial_rxtx": {
+            "addr": 2181042176,
             "size": 1,
             "type": "rw"
         },
-        "uart_ev_enable": {
-            "addr": 2181040148,
-            "size": 1,
-            "type": "rw"
-        },
-        "uart_txempty": {
-            "addr": 2181040152,
+        "serial_txfull": {
+            "addr": 2181042180,
             "size": 1,
             "type": "ro"
         },
-        "uart_rxfull": {
-            "addr": 2181040156,
+        "serial_rxempty": {
+            "addr": 2181042184,
+            "size": 1,
+            "type": "ro"
+        },
+        "serial_ev_status": {
+            "addr": 2181042188,
+            "size": 1,
+            "type": "ro"
+        },
+        "serial_ev_pending": {
+            "addr": 2181042192,
+            "size": 1,
+            "type": "rw"
+        },
+        "serial_ev_enable": {
+            "addr": 2181042196,
+            "size": 1,
+            "type": "rw"
+        },
+        "serial_txempty": {
+            "addr": 2181042200,
+            "size": 1,
+            "type": "ro"
+        },
+        "serial_rxfull": {
+            "addr": 2181042204,
             "size": 1,
             "type": "ro"
         }
@@ -82,7 +88,7 @@
     "memories": {
         "rom": {
             "base": 0,
-            "size": 412,
+            "size": 12136,
             "type": "cached"
         },
         "csr": {
