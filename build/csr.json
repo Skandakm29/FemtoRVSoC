@@ -1,9 +1,7 @@
 {
     "csr_bases": {
         "ctrl": 2181038080,
-        "identifier_mem": 2181040128,
-        "timer0": 2181042176,
-        "uart": 2181044224
+        "uart": 2181040128
     },
     "csr_registers": {
         "ctrl_reset": {
@@ -21,83 +19,43 @@
             "size": 1,
             "type": "ro"
         },
-        "timer0_load": {
-            "addr": 2181042176,
-            "size": 1,
-            "type": "rw"
-        },
-        "timer0_reload": {
-            "addr": 2181042180,
-            "size": 1,
-            "type": "rw"
-        },
-        "timer0_en": {
-            "addr": 2181042184,
-            "size": 1,
-            "type": "rw"
-        },
-        "timer0_update_value": {
-            "addr": 2181042188,
-            "size": 1,
-            "type": "rw"
-        },
-        "timer0_value": {
-            "addr": 2181042192,
-            "size": 1,
-            "type": "ro"
-        },
-        "timer0_ev_status": {
-            "addr": 2181042196,
-            "size": 1,
-            "type": "ro"
-        },
-        "timer0_ev_pending": {
-            "addr": 2181042200,
-            "size": 1,
-            "type": "rw"
-        },
-        "timer0_ev_enable": {
-            "addr": 2181042204,
-            "size": 1,
-            "type": "rw"
-        },
         "uart_rxtx": {
-            "addr": 2181044224,
+            "addr": 2181040128,
             "size": 1,
             "type": "rw"
         },
         "uart_txfull": {
-            "addr": 2181044228,
+            "addr": 2181040132,
             "size": 1,
             "type": "ro"
         },
         "uart_rxempty": {
-            "addr": 2181044232,
+            "addr": 2181040136,
             "size": 1,
             "type": "ro"
         },
         "uart_ev_status": {
-            "addr": 2181044236,
+            "addr": 2181040140,
             "size": 1,
             "type": "ro"
         },
         "uart_ev_pending": {
-            "addr": 2181044240,
+            "addr": 2181040144,
             "size": 1,
             "type": "rw"
         },
         "uart_ev_enable": {
-            "addr": 2181044244,
+            "addr": 2181040148,
             "size": 1,
             "type": "rw"
         },
         "uart_txempty": {
-            "addr": 2181044248,
+            "addr": 2181040152,
             "size": 1,
             "type": "ro"
         },
         "uart_rxfull": {
-            "addr": 2181044252,
+            "addr": 2181040156,
             "size": 1,
             "type": "ro"
         }
@@ -106,15 +64,13 @@
         "config_platform_name": "vsd_mini_fpga",
         "config_clock_frequency": 12000000,
         "config_cpu_reset_addr": 0,
-        "config_cpu_type_serv": null,
-        "config_cpu_variant_standard": null,
+        "config_cpu_type_femtorv": null,
+        "config_cpu_variant_quark": null,
         "config_cpu_family": "riscv",
-        "config_cpu_name": "serv",
-        "config_cpu_human_name": "serv",
+        "config_cpu_name": "femtorv",
+        "config_cpu_human_name": "femtorv-quark",
         "config_cpu_nop": "nop",
         "config_rom_init": 1,
-        "config_bios_no_build_time": null,
-        "config_identifier": "minimal serv soc - rom only",
         "uart_polling": null,
         "config_csr_data_width": 32,
         "config_csr_alignment": 32,
@@ -126,12 +82,7 @@
     "memories": {
         "rom": {
             "base": 0,
-            "size": 14208,
-            "type": "cached"
-        },
-        "sram": {
-            "base": 16777216,
-            "size": 8192,
+            "size": 412,
             "type": "cached"
         },
         "csr": {
