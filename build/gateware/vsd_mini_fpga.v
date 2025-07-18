@@ -8,8 +8,8 @@
 //
 // Filename   : vsd_mini_fpga.v
 // Device     : ice40-up5k-sg48
-// LiteX sha1 : eda4e49b7
-// Date       : 2025-07-14 18:59:22
+// LiteX sha1 : bc25ed7fd
+// Date       : 2025-07-16 14:23:44
 //------------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
@@ -34,8 +34,8 @@ module vsd_mini_fpga (
 //------------------------------------------------------------------------------
 
 /*
-MinimalFemtoRVSoC
-└─── crg (MiniCRG)
+MinimalSoC
+└─── crg (CRG)
 └─── bus (SoCBusHandler)
 │    └─── _interconnect (InterconnectShared)
 │    │    └─── arbiter (Arbiter)
@@ -50,6 +50,7 @@ MinimalFemtoRVSoC
 │    └─── fsm (FSM)
 │    └─── [FemtoRV32]
 └─── rom (SRAM)
+└─── main_ram (SRAM)
 └─── serial_phy (RS232PHY)
 │    └─── tx (RS232PHYTX)
 │    │    └─── clk_phase_accum (RS232ClkPhaseAccum)
@@ -68,6 +69,9 @@ MinimalFemtoRVSoC
 │    │    └─── fifo (SyncFIFOBuffered)
 │    │    │    └─── fifo (SyncFIFO)
 └─── leds (GPIOOut)
+└─── timer0 (Timer)
+│    └─── ev (EventManager)
+│    │    └─── eventsourceprocess_0* (EventSourceProcess)
 └─── csr_bridge (Wishbone2CSR)
 │    └─── fsm (FSM)
 └─── csr_bankarray (CSRBankArray)
@@ -85,6 +89,15 @@ MinimalFemtoRVSoC
 │    │    └─── csrstorage_0* (CSRStorage)
 │    │    └─── csrstatus_4* (CSRStatus)
 │    │    └─── csrstatus_5* (CSRStatus)
+│    └─── csrbank_3* (CSRBank)
+│    │    └─── csrstorage_0* (CSRStorage)
+│    │    └─── csrstorage_1* (CSRStorage)
+│    │    └─── csrstorage_2* (CSRStorage)
+│    │    └─── csrstorage_3* (CSRStorage)
+│    │    └─── csrstatus_0* (CSRStatus)
+│    │    └─── csrstatus_1* (CSRStatus)
+│    │    └─── csrstatus_2* (CSRStatus)
+│    │    └─── csrstorage_4* (CSRStorage)
 └─── csr_interconnect (InterconnectShared)
 * : Generated name.
 []: BlackBox.
@@ -151,6 +164,39 @@ wire          builder_csrbank2_txfull_r;
 reg           builder_csrbank2_txfull_re = 1'd0;
 wire          builder_csrbank2_txfull_w;
 reg           builder_csrbank2_txfull_we = 1'd0;
+wire          builder_csrbank3_en0_r;
+reg           builder_csrbank3_en0_re = 1'd0;
+wire          builder_csrbank3_en0_w;
+reg           builder_csrbank3_en0_we = 1'd0;
+wire          builder_csrbank3_ev_enable0_r;
+reg           builder_csrbank3_ev_enable0_re = 1'd0;
+wire          builder_csrbank3_ev_enable0_w;
+reg           builder_csrbank3_ev_enable0_we = 1'd0;
+wire          builder_csrbank3_ev_pending_r;
+reg           builder_csrbank3_ev_pending_re = 1'd0;
+wire          builder_csrbank3_ev_pending_w;
+reg           builder_csrbank3_ev_pending_we = 1'd0;
+wire          builder_csrbank3_ev_status_r;
+reg           builder_csrbank3_ev_status_re = 1'd0;
+wire          builder_csrbank3_ev_status_w;
+reg           builder_csrbank3_ev_status_we = 1'd0;
+wire   [31:0] builder_csrbank3_load0_r;
+reg           builder_csrbank3_load0_re = 1'd0;
+wire   [31:0] builder_csrbank3_load0_w;
+reg           builder_csrbank3_load0_we = 1'd0;
+wire   [31:0] builder_csrbank3_reload0_r;
+reg           builder_csrbank3_reload0_re = 1'd0;
+wire   [31:0] builder_csrbank3_reload0_w;
+reg           builder_csrbank3_reload0_we = 1'd0;
+wire          builder_csrbank3_sel;
+wire          builder_csrbank3_update_value0_r;
+reg           builder_csrbank3_update_value0_re = 1'd0;
+wire          builder_csrbank3_update_value0_w;
+reg           builder_csrbank3_update_value0_we = 1'd0;
+wire   [31:0] builder_csrbank3_value_r;
+reg           builder_csrbank3_value_re = 1'd0;
+wire   [31:0] builder_csrbank3_value_w;
+reg           builder_csrbank3_value_we = 1'd0;
 wire   [31:0] builder_dat_r;
 wire   [31:0] builder_dat_w;
 wire          builder_done;
@@ -189,6 +235,11 @@ reg    [31:0] builder_interface2_bank_bus_dat_r = 32'd0;
 wire   [31:0] builder_interface2_bank_bus_dat_w;
 wire          builder_interface2_bank_bus_re;
 wire          builder_interface2_bank_bus_we;
+wire   [13:0] builder_interface3_bank_bus_adr;
+reg    [31:0] builder_interface3_bank_bus_dat_r = 32'd0;
+wire   [31:0] builder_interface3_bank_bus_dat_w;
+wire          builder_interface3_bank_bus_re;
+wire          builder_interface3_bank_bus_we;
 wire          builder_re;
 reg           builder_regs0 = 1'd0;
 reg           builder_regs1 = 1'd0;
@@ -208,237 +259,283 @@ wire          builder_shared_err;
 wire    [3:0] builder_shared_sel;
 wire          builder_shared_stb;
 wire          builder_shared_we;
-reg     [1:0] builder_slave_sel = 2'd0;
-reg     [1:0] builder_slave_sel_r = 2'd0;
+reg     [2:0] builder_slave_sel = 3'd0;
+reg     [2:0] builder_slave_sel_r = 3'd0;
 wire          builder_wait;
 wire          builder_we;
 reg           builder_wishbone2csr_next_state = 1'd0;
 reg           builder_wishbone2csr_state = 1'd0;
-wire          main_adapted_interface_ack;
-wire   [29:0] main_adapted_interface_adr;
-wire    [1:0] main_adapted_interface_bte;
-wire    [2:0] main_adapted_interface_cti;
-wire          main_adapted_interface_cyc;
-wire   [31:0] main_adapted_interface_dat_r;
-wire   [31:0] main_adapted_interface_dat_w;
-wire          main_adapted_interface_err;
-wire    [3:0] main_adapted_interface_sel;
-wire          main_adapted_interface_stb;
-wire          main_adapted_interface_we;
-wire   [11:0] main_adr;
-reg           main_adr_burst = 1'd0;
-wire          main_bus_error;
-reg    [31:0] main_bus_errors = 32'd0;
-reg           main_bus_errors_re = 1'd0;
-wire   [31:0] main_bus_errors_status;
-wire          main_bus_errors_we;
-wire          main_cpu_rst;
-wire   [31:0] main_dat_r;
-reg           main_enable_re = 1'd0;
-reg     [1:0] main_enable_storage = 2'd0;
-wire          main_idbus_ack;
-reg    [31:0] main_idbus_adr = 32'd0;
-reg    [31:0] main_idbus_adr_next_value0 = 32'd0;
-reg           main_idbus_adr_next_value_ce0 = 1'd0;
-reg     [1:0] main_idbus_bte = 2'd0;
-reg     [2:0] main_idbus_cti = 3'd0;
-reg           main_idbus_cyc = 1'd0;
-wire   [31:0] main_idbus_dat_r;
-reg    [31:0] main_idbus_dat_w = 32'd0;
-reg    [31:0] main_idbus_dat_w_next_value1 = 32'd0;
-reg           main_idbus_dat_w_next_value_ce1 = 1'd0;
-wire          main_idbus_err;
-reg     [3:0] main_idbus_sel = 4'd0;
-reg     [3:0] main_idbus_sel_next_value2 = 4'd0;
-reg           main_idbus_sel_next_value_ce2 = 1'd0;
-reg           main_idbus_stb = 1'd0;
-reg           main_idbus_we = 1'd0;
-reg           main_idbus_we_next_value3 = 1'd0;
-reg           main_idbus_we_next_value_ce3 = 1'd0;
-wire          main_irq;
-reg           main_latch = 1'd0;
-wire   [31:0] main_mbus_addr;
-reg           main_mbus_rbusy = 1'd0;
-reg    [31:0] main_mbus_rdata0 = 32'd0;
-reg    [31:0] main_mbus_rdata1 = 32'd0;
-wire          main_mbus_rstrb;
-reg           main_mbus_wbusy = 1'd0;
-wire   [31:0] main_mbus_wdata;
-wire    [3:0] main_mbus_wmask;
-reg     [1:0] main_pending_r = 2'd0;
-reg           main_pending_re = 1'd0;
-reg     [1:0] main_pending_status = 2'd0;
-wire          main_pending_we;
-reg           main_ram_bus_ack = 1'd0;
-wire   [29:0] main_ram_bus_adr;
-wire    [1:0] main_ram_bus_bte;
-wire    [2:0] main_ram_bus_cti;
-wire          main_ram_bus_cyc;
-wire   [31:0] main_ram_bus_dat_r;
-wire   [31:0] main_ram_bus_dat_w;
-reg           main_ram_bus_err = 1'd0;
-wire    [3:0] main_ram_bus_sel;
-wire          main_ram_bus_stb;
-wire          main_ram_bus_we;
+wire          main_minimalsoc_adapted_interface_ack;
+wire   [29:0] main_minimalsoc_adapted_interface_adr;
+wire    [1:0] main_minimalsoc_adapted_interface_bte;
+wire    [2:0] main_minimalsoc_adapted_interface_cti;
+wire          main_minimalsoc_adapted_interface_cyc;
+wire   [31:0] main_minimalsoc_adapted_interface_dat_r;
+wire   [31:0] main_minimalsoc_adapted_interface_dat_w;
+wire          main_minimalsoc_adapted_interface_err;
+wire    [3:0] main_minimalsoc_adapted_interface_sel;
+wire          main_minimalsoc_adapted_interface_stb;
+wire          main_minimalsoc_adapted_interface_we;
+wire          main_minimalsoc_bus_error;
+reg    [31:0] main_minimalsoc_bus_errors = 32'd0;
+reg           main_minimalsoc_bus_errors_re = 1'd0;
+wire   [31:0] main_minimalsoc_bus_errors_status;
+wire          main_minimalsoc_bus_errors_we;
+wire          main_minimalsoc_cpu_rst;
+reg           main_minimalsoc_enable_re = 1'd0;
+reg     [1:0] main_minimalsoc_enable_storage = 2'd0;
+wire          main_minimalsoc_idbus_ack;
+reg    [31:0] main_minimalsoc_idbus_adr = 32'd0;
+reg    [31:0] main_minimalsoc_idbus_adr_next_value0 = 32'd0;
+reg           main_minimalsoc_idbus_adr_next_value_ce0 = 1'd0;
+reg     [1:0] main_minimalsoc_idbus_bte = 2'd0;
+reg     [2:0] main_minimalsoc_idbus_cti = 3'd0;
+reg           main_minimalsoc_idbus_cyc = 1'd0;
+wire   [31:0] main_minimalsoc_idbus_dat_r;
+reg    [31:0] main_minimalsoc_idbus_dat_w = 32'd0;
+reg    [31:0] main_minimalsoc_idbus_dat_w_next_value1 = 32'd0;
+reg           main_minimalsoc_idbus_dat_w_next_value_ce1 = 1'd0;
+wire          main_minimalsoc_idbus_err;
+reg     [3:0] main_minimalsoc_idbus_sel = 4'd0;
+reg     [3:0] main_minimalsoc_idbus_sel_next_value2 = 4'd0;
+reg           main_minimalsoc_idbus_sel_next_value_ce2 = 1'd0;
+reg           main_minimalsoc_idbus_stb = 1'd0;
+reg           main_minimalsoc_idbus_we = 1'd0;
+reg           main_minimalsoc_idbus_we_next_value3 = 1'd0;
+reg           main_minimalsoc_idbus_we_next_value_ce3 = 1'd0;
+wire          main_minimalsoc_irq;
+reg           main_minimalsoc_latch = 1'd0;
+wire   [31:0] main_minimalsoc_mbus_addr;
+reg           main_minimalsoc_mbus_rbusy = 1'd0;
+reg    [31:0] main_minimalsoc_mbus_rdata0 = 32'd0;
+reg    [31:0] main_minimalsoc_mbus_rdata1 = 32'd0;
+wire          main_minimalsoc_mbus_rstrb;
+reg           main_minimalsoc_mbus_wbusy = 1'd0;
+wire   [31:0] main_minimalsoc_mbus_wdata;
+wire    [3:0] main_minimalsoc_mbus_wmask;
+wire    [6:0] main_minimalsoc_minimalsoc_adr;
+reg           main_minimalsoc_minimalsoc_adr_burst = 1'd0;
+wire   [31:0] main_minimalsoc_minimalsoc_dat_r;
+reg           main_minimalsoc_minimalsoc_ram_bus_ack = 1'd0;
+wire   [29:0] main_minimalsoc_minimalsoc_ram_bus_adr;
+wire    [1:0] main_minimalsoc_minimalsoc_ram_bus_bte;
+wire    [2:0] main_minimalsoc_minimalsoc_ram_bus_cti;
+wire          main_minimalsoc_minimalsoc_ram_bus_cyc;
+wire   [31:0] main_minimalsoc_minimalsoc_ram_bus_dat_r;
+wire   [31:0] main_minimalsoc_minimalsoc_ram_bus_dat_w;
+reg           main_minimalsoc_minimalsoc_ram_bus_err = 1'd0;
+wire    [3:0] main_minimalsoc_minimalsoc_ram_bus_sel;
+wire          main_minimalsoc_minimalsoc_ram_bus_stb;
+wire          main_minimalsoc_minimalsoc_ram_bus_we;
+reg     [1:0] main_minimalsoc_pending_r = 2'd0;
+reg           main_minimalsoc_pending_re = 1'd0;
+reg     [1:0] main_minimalsoc_pending_status = 2'd0;
+wire          main_minimalsoc_pending_we;
+wire   [10:0] main_minimalsoc_ram_adr;
+reg           main_minimalsoc_ram_adr_burst = 1'd0;
+reg           main_minimalsoc_ram_bus_ram_bus_ack = 1'd0;
+wire   [29:0] main_minimalsoc_ram_bus_ram_bus_adr;
+wire    [1:0] main_minimalsoc_ram_bus_ram_bus_bte;
+wire    [2:0] main_minimalsoc_ram_bus_ram_bus_cti;
+wire          main_minimalsoc_ram_bus_ram_bus_cyc;
+wire   [31:0] main_minimalsoc_ram_bus_ram_bus_dat_r;
+wire   [31:0] main_minimalsoc_ram_bus_ram_bus_dat_w;
+reg           main_minimalsoc_ram_bus_ram_bus_err = 1'd0;
+wire    [3:0] main_minimalsoc_ram_bus_ram_bus_sel;
+wire          main_minimalsoc_ram_bus_ram_bus_stb;
+wire          main_minimalsoc_ram_bus_ram_bus_we;
+wire   [31:0] main_minimalsoc_ram_dat_r;
+wire   [31:0] main_minimalsoc_ram_dat_w;
+reg     [3:0] main_minimalsoc_ram_we = 4'd0;
+wire          main_minimalsoc_reset;
+reg           main_minimalsoc_reset_re = 1'd0;
+reg     [1:0] main_minimalsoc_reset_storage = 2'd0;
+wire          main_minimalsoc_rx0;
+wire          main_minimalsoc_rx1;
+wire          main_minimalsoc_rx2;
+reg           main_minimalsoc_rx_clear = 1'd0;
+reg     [3:0] main_minimalsoc_rx_count = 4'd0;
+reg     [3:0] main_minimalsoc_rx_count_rs232phyrx_next_value0 = 4'd0;
+reg           main_minimalsoc_rx_count_rs232phyrx_next_value_ce0 = 1'd0;
+reg     [7:0] main_minimalsoc_rx_data = 8'd0;
+reg     [7:0] main_minimalsoc_rx_data_rs232phyrx_next_value1 = 8'd0;
+reg           main_minimalsoc_rx_data_rs232phyrx_next_value_ce1 = 1'd0;
+reg           main_minimalsoc_rx_enable = 1'd0;
+reg     [3:0] main_minimalsoc_rx_fifo_consume = 4'd0;
+wire          main_minimalsoc_rx_fifo_do_read;
+wire          main_minimalsoc_rx_fifo_fifo_in_first;
+wire          main_minimalsoc_rx_fifo_fifo_in_last;
+wire    [7:0] main_minimalsoc_rx_fifo_fifo_in_payload_data;
+wire          main_minimalsoc_rx_fifo_fifo_out_first;
+wire          main_minimalsoc_rx_fifo_fifo_out_last;
+wire    [7:0] main_minimalsoc_rx_fifo_fifo_out_payload_data;
+reg     [4:0] main_minimalsoc_rx_fifo_level0 = 5'd0;
+wire    [4:0] main_minimalsoc_rx_fifo_level1;
+reg     [3:0] main_minimalsoc_rx_fifo_produce = 4'd0;
+wire    [3:0] main_minimalsoc_rx_fifo_rdport_adr;
+wire    [9:0] main_minimalsoc_rx_fifo_rdport_dat_r;
+wire          main_minimalsoc_rx_fifo_rdport_re;
+wire          main_minimalsoc_rx_fifo_re;
+reg           main_minimalsoc_rx_fifo_readable = 1'd0;
+reg           main_minimalsoc_rx_fifo_replace = 1'd0;
+wire          main_minimalsoc_rx_fifo_sink_first;
+wire          main_minimalsoc_rx_fifo_sink_last;
+wire    [7:0] main_minimalsoc_rx_fifo_sink_payload_data;
+wire          main_minimalsoc_rx_fifo_sink_ready;
+wire          main_minimalsoc_rx_fifo_sink_valid;
+wire          main_minimalsoc_rx_fifo_source_first;
+wire          main_minimalsoc_rx_fifo_source_last;
+wire    [7:0] main_minimalsoc_rx_fifo_source_payload_data;
+wire          main_minimalsoc_rx_fifo_source_ready;
+wire          main_minimalsoc_rx_fifo_source_valid;
+wire    [9:0] main_minimalsoc_rx_fifo_syncfifo_din;
+wire    [9:0] main_minimalsoc_rx_fifo_syncfifo_dout;
+wire          main_minimalsoc_rx_fifo_syncfifo_re;
+wire          main_minimalsoc_rx_fifo_syncfifo_readable;
+wire          main_minimalsoc_rx_fifo_syncfifo_we;
+wire          main_minimalsoc_rx_fifo_syncfifo_writable;
+reg     [3:0] main_minimalsoc_rx_fifo_wrport_adr = 4'd0;
+wire    [9:0] main_minimalsoc_rx_fifo_wrport_dat_r;
+wire    [9:0] main_minimalsoc_rx_fifo_wrport_dat_w;
+wire          main_minimalsoc_rx_fifo_wrport_we;
+reg           main_minimalsoc_rx_pending = 1'd0;
+reg    [31:0] main_minimalsoc_rx_phase = 32'd0;
+wire          main_minimalsoc_rx_rx;
+reg           main_minimalsoc_rx_rx_d = 1'd0;
+reg           main_minimalsoc_rx_source_first = 1'd0;
+reg           main_minimalsoc_rx_source_last = 1'd0;
+reg     [7:0] main_minimalsoc_rx_source_payload_data = 8'd0;
+wire          main_minimalsoc_rx_source_ready;
+reg           main_minimalsoc_rx_source_valid = 1'd0;
+wire          main_minimalsoc_rx_status;
+reg           main_minimalsoc_rx_tick = 1'd0;
+wire          main_minimalsoc_rx_trigger;
+reg           main_minimalsoc_rx_trigger_d = 1'd0;
+reg           main_minimalsoc_rxempty_re = 1'd0;
+wire          main_minimalsoc_rxempty_status;
+wire          main_minimalsoc_rxempty_we;
+reg           main_minimalsoc_rxfull_re = 1'd0;
+wire          main_minimalsoc_rxfull_status;
+wire          main_minimalsoc_rxfull_we;
+wire    [7:0] main_minimalsoc_rxtx_r;
+reg           main_minimalsoc_rxtx_re = 1'd0;
+wire    [7:0] main_minimalsoc_rxtx_w;
+reg           main_minimalsoc_rxtx_we = 1'd0;
+reg           main_minimalsoc_scratch_re = 1'd0;
+reg    [31:0] main_minimalsoc_scratch_storage = 32'd305419896;
+reg           main_minimalsoc_serial_tx_rs232phytx_next_value1 = 1'd0;
+reg           main_minimalsoc_serial_tx_rs232phytx_next_value_ce1 = 1'd0;
+reg           main_minimalsoc_soc_rst = 1'd0;
+reg           main_minimalsoc_status_re = 1'd0;
+reg     [1:0] main_minimalsoc_status_status = 2'd0;
+wire          main_minimalsoc_status_we;
+wire          main_minimalsoc_tx0;
+wire          main_minimalsoc_tx1;
+wire          main_minimalsoc_tx2;
+reg           main_minimalsoc_tx_clear = 1'd0;
+reg     [3:0] main_minimalsoc_tx_count = 4'd0;
+reg     [3:0] main_minimalsoc_tx_count_rs232phytx_next_value0 = 4'd0;
+reg           main_minimalsoc_tx_count_rs232phytx_next_value_ce0 = 1'd0;
+reg     [7:0] main_minimalsoc_tx_data = 8'd0;
+reg     [7:0] main_minimalsoc_tx_data_rs232phytx_next_value2 = 8'd0;
+reg           main_minimalsoc_tx_data_rs232phytx_next_value_ce2 = 1'd0;
+reg           main_minimalsoc_tx_enable = 1'd0;
+reg     [3:0] main_minimalsoc_tx_fifo_consume = 4'd0;
+wire          main_minimalsoc_tx_fifo_do_read;
+wire          main_minimalsoc_tx_fifo_fifo_in_first;
+wire          main_minimalsoc_tx_fifo_fifo_in_last;
+wire    [7:0] main_minimalsoc_tx_fifo_fifo_in_payload_data;
+wire          main_minimalsoc_tx_fifo_fifo_out_first;
+wire          main_minimalsoc_tx_fifo_fifo_out_last;
+wire    [7:0] main_minimalsoc_tx_fifo_fifo_out_payload_data;
+reg     [4:0] main_minimalsoc_tx_fifo_level0 = 5'd0;
+wire    [4:0] main_minimalsoc_tx_fifo_level1;
+reg     [3:0] main_minimalsoc_tx_fifo_produce = 4'd0;
+wire    [3:0] main_minimalsoc_tx_fifo_rdport_adr;
+wire    [9:0] main_minimalsoc_tx_fifo_rdport_dat_r;
+wire          main_minimalsoc_tx_fifo_rdport_re;
+wire          main_minimalsoc_tx_fifo_re;
+reg           main_minimalsoc_tx_fifo_readable = 1'd0;
+reg           main_minimalsoc_tx_fifo_replace = 1'd0;
+reg           main_minimalsoc_tx_fifo_sink_first = 1'd0;
+reg           main_minimalsoc_tx_fifo_sink_last = 1'd0;
+wire    [7:0] main_minimalsoc_tx_fifo_sink_payload_data;
+wire          main_minimalsoc_tx_fifo_sink_ready;
+wire          main_minimalsoc_tx_fifo_sink_valid;
+wire          main_minimalsoc_tx_fifo_source_first;
+wire          main_minimalsoc_tx_fifo_source_last;
+wire    [7:0] main_minimalsoc_tx_fifo_source_payload_data;
+wire          main_minimalsoc_tx_fifo_source_ready;
+wire          main_minimalsoc_tx_fifo_source_valid;
+wire    [9:0] main_minimalsoc_tx_fifo_syncfifo_din;
+wire    [9:0] main_minimalsoc_tx_fifo_syncfifo_dout;
+wire          main_minimalsoc_tx_fifo_syncfifo_re;
+wire          main_minimalsoc_tx_fifo_syncfifo_readable;
+wire          main_minimalsoc_tx_fifo_syncfifo_we;
+wire          main_minimalsoc_tx_fifo_syncfifo_writable;
+reg     [3:0] main_minimalsoc_tx_fifo_wrport_adr = 4'd0;
+wire    [9:0] main_minimalsoc_tx_fifo_wrport_dat_r;
+wire    [9:0] main_minimalsoc_tx_fifo_wrport_dat_w;
+wire          main_minimalsoc_tx_fifo_wrport_we;
+reg           main_minimalsoc_tx_pending = 1'd0;
+reg    [31:0] main_minimalsoc_tx_phase = 32'd0;
+wire          main_minimalsoc_tx_sink_first;
+wire          main_minimalsoc_tx_sink_last;
+wire    [7:0] main_minimalsoc_tx_sink_payload_data;
+reg           main_minimalsoc_tx_sink_ready = 1'd0;
+wire          main_minimalsoc_tx_sink_valid;
+wire          main_minimalsoc_tx_status;
+reg           main_minimalsoc_tx_tick = 1'd0;
+wire          main_minimalsoc_tx_trigger;
+reg           main_minimalsoc_tx_trigger_d = 1'd0;
+reg           main_minimalsoc_txempty_re = 1'd0;
+wire          main_minimalsoc_txempty_status;
+wire          main_minimalsoc_txempty_we;
+reg           main_minimalsoc_txfull_re = 1'd0;
+wire          main_minimalsoc_txfull_status;
+wire          main_minimalsoc_txfull_we;
+wire          main_minimalsoc_uart_sink_first;
+wire          main_minimalsoc_uart_sink_last;
+wire    [7:0] main_minimalsoc_uart_sink_payload_data;
+wire          main_minimalsoc_uart_sink_ready;
+wire          main_minimalsoc_uart_sink_valid;
+wire          main_minimalsoc_uart_source_first;
+wire          main_minimalsoc_uart_source_last;
+wire    [7:0] main_minimalsoc_uart_source_payload_data;
+wire          main_minimalsoc_uart_source_ready;
+wire          main_minimalsoc_uart_source_valid;
 reg           main_re = 1'd0;
-wire          main_reset;
-reg           main_reset_re = 1'd0;
-reg     [1:0] main_reset_storage = 2'd0;
-wire          main_rx0;
-wire          main_rx1;
-wire          main_rx2;
-reg           main_rx_clear = 1'd0;
-reg     [3:0] main_rx_count = 4'd0;
-reg     [3:0] main_rx_count_rs232phyrx_next_value0 = 4'd0;
-reg           main_rx_count_rs232phyrx_next_value_ce0 = 1'd0;
-reg     [7:0] main_rx_data = 8'd0;
-reg     [7:0] main_rx_data_rs232phyrx_next_value1 = 8'd0;
-reg           main_rx_data_rs232phyrx_next_value_ce1 = 1'd0;
-reg           main_rx_enable = 1'd0;
-reg     [3:0] main_rx_fifo_consume = 4'd0;
-wire          main_rx_fifo_do_read;
-wire          main_rx_fifo_fifo_in_first;
-wire          main_rx_fifo_fifo_in_last;
-wire    [7:0] main_rx_fifo_fifo_in_payload_data;
-wire          main_rx_fifo_fifo_out_first;
-wire          main_rx_fifo_fifo_out_last;
-wire    [7:0] main_rx_fifo_fifo_out_payload_data;
-reg     [4:0] main_rx_fifo_level0 = 5'd0;
-wire    [4:0] main_rx_fifo_level1;
-reg     [3:0] main_rx_fifo_produce = 4'd0;
-wire    [3:0] main_rx_fifo_rdport_adr;
-wire    [9:0] main_rx_fifo_rdport_dat_r;
-wire          main_rx_fifo_rdport_re;
-wire          main_rx_fifo_re;
-reg           main_rx_fifo_readable = 1'd0;
-reg           main_rx_fifo_replace = 1'd0;
-wire          main_rx_fifo_sink_first;
-wire          main_rx_fifo_sink_last;
-wire    [7:0] main_rx_fifo_sink_payload_data;
-wire          main_rx_fifo_sink_ready;
-wire          main_rx_fifo_sink_valid;
-wire          main_rx_fifo_source_first;
-wire          main_rx_fifo_source_last;
-wire    [7:0] main_rx_fifo_source_payload_data;
-wire          main_rx_fifo_source_ready;
-wire          main_rx_fifo_source_valid;
-wire    [9:0] main_rx_fifo_syncfifo_din;
-wire    [9:0] main_rx_fifo_syncfifo_dout;
-wire          main_rx_fifo_syncfifo_re;
-wire          main_rx_fifo_syncfifo_readable;
-wire          main_rx_fifo_syncfifo_we;
-wire          main_rx_fifo_syncfifo_writable;
-reg     [3:0] main_rx_fifo_wrport_adr = 4'd0;
-wire    [9:0] main_rx_fifo_wrport_dat_r;
-wire    [9:0] main_rx_fifo_wrport_dat_w;
-wire          main_rx_fifo_wrport_we;
-reg           main_rx_pending = 1'd0;
-reg    [31:0] main_rx_phase = 32'd0;
-wire          main_rx_rx;
-reg           main_rx_rx_d = 1'd0;
-reg           main_rx_source_first = 1'd0;
-reg           main_rx_source_last = 1'd0;
-reg     [7:0] main_rx_source_payload_data = 8'd0;
-wire          main_rx_source_ready;
-reg           main_rx_source_valid = 1'd0;
-wire          main_rx_status;
-reg           main_rx_tick = 1'd0;
-wire          main_rx_trigger;
-reg           main_rx_trigger_d = 1'd0;
-reg           main_rxempty_re = 1'd0;
-wire          main_rxempty_status;
-wire          main_rxempty_we;
-reg           main_rxfull_re = 1'd0;
-wire          main_rxfull_status;
-wire          main_rxfull_we;
-wire    [7:0] main_rxtx_r;
-reg           main_rxtx_re = 1'd0;
-wire    [7:0] main_rxtx_w;
-reg           main_rxtx_we = 1'd0;
-reg           main_scratch_re = 1'd0;
-reg    [31:0] main_scratch_storage = 32'd305419896;
-reg           main_serial_tx_rs232phytx_next_value1 = 1'd0;
-reg           main_serial_tx_rs232phytx_next_value_ce1 = 1'd0;
-reg           main_soc_rst = 1'd0;
-reg           main_status_re = 1'd0;
-reg     [1:0] main_status_status = 2'd0;
-wire          main_status_we;
 reg     [2:0] main_storage = 3'd0;
-wire          main_tx0;
-wire          main_tx1;
-wire          main_tx2;
-reg           main_tx_clear = 1'd0;
-reg     [3:0] main_tx_count = 4'd0;
-reg     [3:0] main_tx_count_rs232phytx_next_value0 = 4'd0;
-reg           main_tx_count_rs232phytx_next_value_ce0 = 1'd0;
-reg     [7:0] main_tx_data = 8'd0;
-reg     [7:0] main_tx_data_rs232phytx_next_value2 = 8'd0;
-reg           main_tx_data_rs232phytx_next_value_ce2 = 1'd0;
-reg           main_tx_enable = 1'd0;
-reg     [3:0] main_tx_fifo_consume = 4'd0;
-wire          main_tx_fifo_do_read;
-wire          main_tx_fifo_fifo_in_first;
-wire          main_tx_fifo_fifo_in_last;
-wire    [7:0] main_tx_fifo_fifo_in_payload_data;
-wire          main_tx_fifo_fifo_out_first;
-wire          main_tx_fifo_fifo_out_last;
-wire    [7:0] main_tx_fifo_fifo_out_payload_data;
-reg     [4:0] main_tx_fifo_level0 = 5'd0;
-wire    [4:0] main_tx_fifo_level1;
-reg     [3:0] main_tx_fifo_produce = 4'd0;
-wire    [3:0] main_tx_fifo_rdport_adr;
-wire    [9:0] main_tx_fifo_rdport_dat_r;
-wire          main_tx_fifo_rdport_re;
-wire          main_tx_fifo_re;
-reg           main_tx_fifo_readable = 1'd0;
-reg           main_tx_fifo_replace = 1'd0;
-reg           main_tx_fifo_sink_first = 1'd0;
-reg           main_tx_fifo_sink_last = 1'd0;
-wire    [7:0] main_tx_fifo_sink_payload_data;
-wire          main_tx_fifo_sink_ready;
-wire          main_tx_fifo_sink_valid;
-wire          main_tx_fifo_source_first;
-wire          main_tx_fifo_source_last;
-wire    [7:0] main_tx_fifo_source_payload_data;
-wire          main_tx_fifo_source_ready;
-wire          main_tx_fifo_source_valid;
-wire    [9:0] main_tx_fifo_syncfifo_din;
-wire    [9:0] main_tx_fifo_syncfifo_dout;
-wire          main_tx_fifo_syncfifo_re;
-wire          main_tx_fifo_syncfifo_readable;
-wire          main_tx_fifo_syncfifo_we;
-wire          main_tx_fifo_syncfifo_writable;
-reg     [3:0] main_tx_fifo_wrport_adr = 4'd0;
-wire    [9:0] main_tx_fifo_wrport_dat_r;
-wire    [9:0] main_tx_fifo_wrport_dat_w;
-wire          main_tx_fifo_wrport_we;
-reg           main_tx_pending = 1'd0;
-reg    [31:0] main_tx_phase = 32'd0;
-wire          main_tx_sink_first;
-wire          main_tx_sink_last;
-wire    [7:0] main_tx_sink_payload_data;
-reg           main_tx_sink_ready = 1'd0;
-wire          main_tx_sink_valid;
-wire          main_tx_status;
-reg           main_tx_tick = 1'd0;
-wire          main_tx_trigger;
-reg           main_tx_trigger_d = 1'd0;
-reg           main_txempty_re = 1'd0;
-wire          main_txempty_status;
-wire          main_txempty_we;
-reg           main_txfull_re = 1'd0;
-wire          main_txfull_status;
-wire          main_txfull_we;
-wire          main_uart_sink_first;
-wire          main_uart_sink_last;
-wire    [7:0] main_uart_sink_payload_data;
-wire          main_uart_sink_ready;
-wire          main_uart_sink_valid;
-wire          main_uart_source_first;
-wire          main_uart_source_last;
-wire    [7:0] main_uart_source_payload_data;
-wire          main_uart_source_ready;
-wire          main_uart_source_valid;
+reg           main_timer0_en_re = 1'd0;
+reg           main_timer0_en_storage = 1'd0;
+reg           main_timer0_enable_re = 1'd0;
+reg           main_timer0_enable_storage = 1'd0;
+wire          main_timer0_irq;
+reg           main_timer0_load_re = 1'd0;
+reg    [31:0] main_timer0_load_storage = 32'd0;
+reg           main_timer0_pending_r = 1'd0;
+reg           main_timer0_pending_re = 1'd0;
+wire          main_timer0_pending_status;
+wire          main_timer0_pending_we;
+reg           main_timer0_reload_re = 1'd0;
+reg    [31:0] main_timer0_reload_storage = 32'd0;
+reg           main_timer0_status_re = 1'd0;
+wire          main_timer0_status_status;
+wire          main_timer0_status_we;
+reg           main_timer0_update_value_re = 1'd0;
+reg           main_timer0_update_value_storage = 1'd0;
+reg    [31:0] main_timer0_value = 32'd0;
+reg           main_timer0_value_re = 1'd0;
+reg    [31:0] main_timer0_value_status = 32'd0;
+wire          main_timer0_value_we;
+wire          main_timer0_zero0;
+wire          main_timer0_zero1;
+wire          main_timer0_zero2;
+reg           main_timer0_zero_clear = 1'd0;
+reg           main_timer0_zero_pending = 1'd0;
+wire          main_timer0_zero_status;
+wire          main_timer0_zero_trigger;
+reg           main_timer0_zero_trigger_d = 1'd0;
 wire          sys_clk;
 reg           sys_rst = 1'd0;
 
@@ -446,20 +543,20 @@ reg           sys_rst = 1'd0;
 // Combinatorial Logic
 //------------------------------------------------------------------------------
 
-assign main_reset = (main_soc_rst | main_cpu_rst);
-assign main_bus_error = builder_error;
+assign main_minimalsoc_reset = (main_minimalsoc_soc_rst | main_minimalsoc_cpu_rst);
+assign main_minimalsoc_bus_error = builder_error;
 assign sys_clk = clk12;
-assign main_adapted_interface_dat_w = main_idbus_dat_w;
-assign main_idbus_dat_r = main_adapted_interface_dat_r;
-assign main_adapted_interface_sel = main_idbus_sel;
-assign main_adapted_interface_cyc = main_idbus_cyc;
-assign main_adapted_interface_stb = main_idbus_stb;
-assign main_idbus_ack = main_adapted_interface_ack;
-assign main_adapted_interface_we = main_idbus_we;
-assign main_adapted_interface_cti = main_idbus_cti;
-assign main_adapted_interface_bte = main_idbus_bte;
-assign main_idbus_err = main_adapted_interface_err;
-assign main_adapted_interface_adr = main_idbus_adr[31:2];
+assign main_minimalsoc_adapted_interface_dat_w = main_minimalsoc_idbus_dat_w;
+assign main_minimalsoc_idbus_dat_r = main_minimalsoc_adapted_interface_dat_r;
+assign main_minimalsoc_adapted_interface_sel = main_minimalsoc_idbus_sel;
+assign main_minimalsoc_adapted_interface_cyc = main_minimalsoc_idbus_cyc;
+assign main_minimalsoc_adapted_interface_stb = main_minimalsoc_idbus_stb;
+assign main_minimalsoc_idbus_ack = main_minimalsoc_adapted_interface_ack;
+assign main_minimalsoc_adapted_interface_we = main_minimalsoc_idbus_we;
+assign main_minimalsoc_adapted_interface_cti = main_minimalsoc_idbus_cti;
+assign main_minimalsoc_adapted_interface_bte = main_minimalsoc_idbus_bte;
+assign main_minimalsoc_idbus_err = main_minimalsoc_adapted_interface_err;
+assign main_minimalsoc_adapted_interface_adr = main_minimalsoc_idbus_adr[31:2];
 assign builder_shared_adr = builder_array_muxed0;
 assign builder_shared_dat_w = builder_array_muxed1;
 assign builder_shared_sel = builder_array_muxed2;
@@ -468,23 +565,31 @@ assign builder_shared_stb = builder_array_muxed4;
 assign builder_shared_we = builder_array_muxed5;
 assign builder_shared_cti = builder_array_muxed6;
 assign builder_shared_bte = builder_array_muxed7;
-assign main_adapted_interface_dat_r = builder_shared_dat_r;
-assign main_adapted_interface_ack = (builder_shared_ack & (builder_grant == 1'd0));
-assign main_adapted_interface_err = (builder_shared_err & (builder_grant == 1'd0));
-assign builder_request = {main_adapted_interface_cyc};
+assign main_minimalsoc_adapted_interface_dat_r = builder_shared_dat_r;
+assign main_minimalsoc_adapted_interface_ack = (builder_shared_ack & (builder_grant == 1'd0));
+assign main_minimalsoc_adapted_interface_err = (builder_shared_err & (builder_grant == 1'd0));
+assign builder_request = {main_minimalsoc_adapted_interface_cyc};
 assign builder_grant = 1'd0;
 always @(*) begin
-    builder_slave_sel <= 2'd0;
-    builder_slave_sel[0] <= (builder_shared_adr[29:12] == 1'd0);
-    builder_slave_sel[1] <= (builder_shared_adr[29:14] == 16'd33280);
+    builder_slave_sel <= 3'd0;
+    builder_slave_sel[0] <= (builder_shared_adr[29:7] == 1'd0);
+    builder_slave_sel[1] <= (builder_shared_adr[29:11] == 18'd131072);
+    builder_slave_sel[2] <= (builder_shared_adr[29:14] == 16'd33280);
 end
-assign main_ram_bus_adr = builder_shared_adr;
-assign main_ram_bus_dat_w = builder_shared_dat_w;
-assign main_ram_bus_sel = builder_shared_sel;
-assign main_ram_bus_stb = builder_shared_stb;
-assign main_ram_bus_we = builder_shared_we;
-assign main_ram_bus_cti = builder_shared_cti;
-assign main_ram_bus_bte = builder_shared_bte;
+assign main_minimalsoc_minimalsoc_ram_bus_adr = builder_shared_adr;
+assign main_minimalsoc_minimalsoc_ram_bus_dat_w = builder_shared_dat_w;
+assign main_minimalsoc_minimalsoc_ram_bus_sel = builder_shared_sel;
+assign main_minimalsoc_minimalsoc_ram_bus_stb = builder_shared_stb;
+assign main_minimalsoc_minimalsoc_ram_bus_we = builder_shared_we;
+assign main_minimalsoc_minimalsoc_ram_bus_cti = builder_shared_cti;
+assign main_minimalsoc_minimalsoc_ram_bus_bte = builder_shared_bte;
+assign main_minimalsoc_ram_bus_ram_bus_adr = builder_shared_adr;
+assign main_minimalsoc_ram_bus_ram_bus_dat_w = builder_shared_dat_w;
+assign main_minimalsoc_ram_bus_ram_bus_sel = builder_shared_sel;
+assign main_minimalsoc_ram_bus_ram_bus_stb = builder_shared_stb;
+assign main_minimalsoc_ram_bus_ram_bus_we = builder_shared_we;
+assign main_minimalsoc_ram_bus_ram_bus_cti = builder_shared_cti;
+assign main_minimalsoc_ram_bus_ram_bus_bte = builder_shared_bte;
 assign builder_interface0_adr = builder_shared_adr;
 assign builder_interface0_dat_w = builder_shared_dat_w;
 assign builder_interface0_sel = builder_shared_sel;
@@ -492,16 +597,17 @@ assign builder_interface0_stb = builder_shared_stb;
 assign builder_interface0_we = builder_shared_we;
 assign builder_interface0_cti = builder_shared_cti;
 assign builder_interface0_bte = builder_shared_bte;
-assign main_ram_bus_cyc = (builder_shared_cyc & builder_slave_sel[0]);
-assign builder_interface0_cyc = (builder_shared_cyc & builder_slave_sel[1]);
-assign builder_shared_err = (main_ram_bus_err | builder_interface0_err);
+assign main_minimalsoc_minimalsoc_ram_bus_cyc = (builder_shared_cyc & builder_slave_sel[0]);
+assign main_minimalsoc_ram_bus_ram_bus_cyc = (builder_shared_cyc & builder_slave_sel[1]);
+assign builder_interface0_cyc = (builder_shared_cyc & builder_slave_sel[2]);
+assign builder_shared_err = ((main_minimalsoc_minimalsoc_ram_bus_err | main_minimalsoc_ram_bus_ram_bus_err) | builder_interface0_err);
 assign builder_wait = ((builder_shared_stb & builder_shared_cyc) & (~builder_shared_ack));
 always @(*) begin
     builder_error <= 1'd0;
     builder_shared_ack <= 1'd0;
     builder_shared_dat_r <= 32'd0;
-    builder_shared_ack <= (main_ram_bus_ack | builder_interface0_ack);
-    builder_shared_dat_r <= (({32{builder_slave_sel_r[0]}} & main_ram_bus_dat_r) | ({32{builder_slave_sel_r[1]}} & builder_interface0_dat_r));
+    builder_shared_ack <= ((main_minimalsoc_minimalsoc_ram_bus_ack | main_minimalsoc_ram_bus_ram_bus_ack) | builder_interface0_ack);
+    builder_shared_dat_r <= ((({32{builder_slave_sel_r[0]}} & main_minimalsoc_minimalsoc_ram_bus_dat_r) | ({32{builder_slave_sel_r[1]}} & main_minimalsoc_ram_bus_ram_bus_dat_r)) | ({32{builder_slave_sel_r[2]}} & builder_interface0_dat_r));
     if (builder_done) begin
         builder_shared_dat_r <= 32'd4294967295;
         builder_shared_ack <= 1'd1;
@@ -509,97 +615,107 @@ always @(*) begin
     end
 end
 assign builder_done = (builder_count == 1'd0);
-assign main_bus_errors_status = main_bus_errors;
+assign main_minimalsoc_bus_errors_status = main_minimalsoc_bus_errors;
 always @(*) begin
-    main_mbus_rdata0 <= 32'd0;
-    main_mbus_rdata0 <= main_mbus_rdata1;
-    if (main_latch) begin
-        main_mbus_rdata0 <= main_idbus_dat_r;
+    main_minimalsoc_mbus_rdata0 <= 32'd0;
+    main_minimalsoc_mbus_rdata0 <= main_minimalsoc_mbus_rdata1;
+    if (main_minimalsoc_latch) begin
+        main_minimalsoc_mbus_rdata0 <= main_minimalsoc_idbus_dat_r;
     end
 end
 always @(*) begin
     builder_femtorv_next_state <= 1'd0;
-    main_idbus_adr_next_value0 <= 32'd0;
-    main_idbus_adr_next_value_ce0 <= 1'd0;
-    main_idbus_cyc <= 1'd0;
-    main_idbus_dat_w_next_value1 <= 32'd0;
-    main_idbus_dat_w_next_value_ce1 <= 1'd0;
-    main_idbus_sel_next_value2 <= 4'd0;
-    main_idbus_sel_next_value_ce2 <= 1'd0;
-    main_idbus_stb <= 1'd0;
-    main_idbus_we_next_value3 <= 1'd0;
-    main_idbus_we_next_value_ce3 <= 1'd0;
-    main_latch <= 1'd0;
-    main_mbus_rbusy <= 1'd0;
-    main_mbus_wbusy <= 1'd0;
+    main_minimalsoc_idbus_adr_next_value0 <= 32'd0;
+    main_minimalsoc_idbus_adr_next_value_ce0 <= 1'd0;
+    main_minimalsoc_idbus_cyc <= 1'd0;
+    main_minimalsoc_idbus_dat_w_next_value1 <= 32'd0;
+    main_minimalsoc_idbus_dat_w_next_value_ce1 <= 1'd0;
+    main_minimalsoc_idbus_sel_next_value2 <= 4'd0;
+    main_minimalsoc_idbus_sel_next_value_ce2 <= 1'd0;
+    main_minimalsoc_idbus_stb <= 1'd0;
+    main_minimalsoc_idbus_we_next_value3 <= 1'd0;
+    main_minimalsoc_idbus_we_next_value_ce3 <= 1'd0;
+    main_minimalsoc_latch <= 1'd0;
+    main_minimalsoc_mbus_rbusy <= 1'd0;
+    main_minimalsoc_mbus_wbusy <= 1'd0;
     builder_femtorv_next_state <= builder_femtorv_state;
     case (builder_femtorv_state)
         1'd1: begin
-            main_idbus_stb <= 1'd1;
-            main_idbus_cyc <= 1'd1;
-            main_mbus_wbusy <= 1'd1;
-            main_mbus_rbusy <= 1'd1;
-            if (main_idbus_ack) begin
-                main_mbus_wbusy <= 1'd0;
-                main_mbus_rbusy <= 1'd0;
-                main_latch <= 1'd1;
+            main_minimalsoc_idbus_stb <= 1'd1;
+            main_minimalsoc_idbus_cyc <= 1'd1;
+            main_minimalsoc_mbus_wbusy <= 1'd1;
+            main_minimalsoc_mbus_rbusy <= 1'd1;
+            if (main_minimalsoc_idbus_ack) begin
+                main_minimalsoc_mbus_wbusy <= 1'd0;
+                main_minimalsoc_mbus_rbusy <= 1'd0;
+                main_minimalsoc_latch <= 1'd1;
                 builder_femtorv_next_state <= 1'd0;
             end
         end
         default: begin
-            main_idbus_adr_next_value0 <= main_mbus_addr;
-            main_idbus_adr_next_value_ce0 <= 1'd1;
-            main_idbus_dat_w_next_value1 <= main_mbus_wdata;
-            main_idbus_dat_w_next_value_ce1 <= 1'd1;
-            main_idbus_sel_next_value2 <= main_mbus_wmask;
-            main_idbus_sel_next_value_ce2 <= 1'd1;
-            if ((main_mbus_rstrb | (main_mbus_wmask != 1'd0))) begin
-                main_idbus_we_next_value3 <= (main_mbus_wmask != 1'd0);
-                main_idbus_we_next_value_ce3 <= 1'd1;
+            main_minimalsoc_idbus_adr_next_value0 <= main_minimalsoc_mbus_addr;
+            main_minimalsoc_idbus_adr_next_value_ce0 <= 1'd1;
+            main_minimalsoc_idbus_dat_w_next_value1 <= main_minimalsoc_mbus_wdata;
+            main_minimalsoc_idbus_dat_w_next_value_ce1 <= 1'd1;
+            main_minimalsoc_idbus_sel_next_value2 <= main_minimalsoc_mbus_wmask;
+            main_minimalsoc_idbus_sel_next_value_ce2 <= 1'd1;
+            if ((main_minimalsoc_mbus_rstrb | (main_minimalsoc_mbus_wmask != 1'd0))) begin
+                main_minimalsoc_idbus_we_next_value3 <= (main_minimalsoc_mbus_wmask != 1'd0);
+                main_minimalsoc_idbus_we_next_value_ce3 <= 1'd1;
                 builder_femtorv_next_state <= 1'd1;
             end
         end
     endcase
 end
-assign main_adr = main_ram_bus_adr[11:0];
-assign main_ram_bus_dat_r = main_dat_r;
+assign main_minimalsoc_minimalsoc_adr = main_minimalsoc_minimalsoc_ram_bus_adr[6:0];
+assign main_minimalsoc_minimalsoc_ram_bus_dat_r = main_minimalsoc_minimalsoc_dat_r;
+always @(*) begin
+    main_minimalsoc_ram_we <= 4'd0;
+    main_minimalsoc_ram_we[0] <= (((main_minimalsoc_ram_bus_ram_bus_cyc & main_minimalsoc_ram_bus_ram_bus_stb) & main_minimalsoc_ram_bus_ram_bus_we) & main_minimalsoc_ram_bus_ram_bus_sel[0]);
+    main_minimalsoc_ram_we[1] <= (((main_minimalsoc_ram_bus_ram_bus_cyc & main_minimalsoc_ram_bus_ram_bus_stb) & main_minimalsoc_ram_bus_ram_bus_we) & main_minimalsoc_ram_bus_ram_bus_sel[1]);
+    main_minimalsoc_ram_we[2] <= (((main_minimalsoc_ram_bus_ram_bus_cyc & main_minimalsoc_ram_bus_ram_bus_stb) & main_minimalsoc_ram_bus_ram_bus_we) & main_minimalsoc_ram_bus_ram_bus_sel[2]);
+    main_minimalsoc_ram_we[3] <= (((main_minimalsoc_ram_bus_ram_bus_cyc & main_minimalsoc_ram_bus_ram_bus_stb) & main_minimalsoc_ram_bus_ram_bus_we) & main_minimalsoc_ram_bus_ram_bus_sel[3]);
+end
+assign main_minimalsoc_ram_adr = main_minimalsoc_ram_bus_ram_bus_adr[10:0];
+assign main_minimalsoc_ram_bus_ram_bus_dat_r = main_minimalsoc_ram_dat_r;
+assign main_minimalsoc_ram_dat_w = main_minimalsoc_ram_bus_ram_bus_dat_w;
 always @(*) begin
     builder_rs232phytx_next_state <= 1'd0;
-    main_serial_tx_rs232phytx_next_value1 <= 1'd0;
-    main_serial_tx_rs232phytx_next_value_ce1 <= 1'd0;
-    main_tx_count_rs232phytx_next_value0 <= 4'd0;
-    main_tx_count_rs232phytx_next_value_ce0 <= 1'd0;
-    main_tx_data_rs232phytx_next_value2 <= 8'd0;
-    main_tx_data_rs232phytx_next_value_ce2 <= 1'd0;
-    main_tx_enable <= 1'd0;
-    main_tx_sink_ready <= 1'd0;
+    main_minimalsoc_serial_tx_rs232phytx_next_value1 <= 1'd0;
+    main_minimalsoc_serial_tx_rs232phytx_next_value_ce1 <= 1'd0;
+    main_minimalsoc_tx_count_rs232phytx_next_value0 <= 4'd0;
+    main_minimalsoc_tx_count_rs232phytx_next_value_ce0 <= 1'd0;
+    main_minimalsoc_tx_data_rs232phytx_next_value2 <= 8'd0;
+    main_minimalsoc_tx_data_rs232phytx_next_value_ce2 <= 1'd0;
+    main_minimalsoc_tx_enable <= 1'd0;
+    main_minimalsoc_tx_sink_ready <= 1'd0;
     builder_rs232phytx_next_state <= builder_rs232phytx_state;
     case (builder_rs232phytx_state)
         1'd1: begin
-            main_tx_enable <= 1'd1;
-            if (main_tx_tick) begin
-                main_serial_tx_rs232phytx_next_value1 <= main_tx_data[0];
-                main_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
-                main_tx_count_rs232phytx_next_value0 <= (main_tx_count + 1'd1);
-                main_tx_count_rs232phytx_next_value_ce0 <= 1'd1;
-                main_tx_data_rs232phytx_next_value2 <= {1'd1, main_tx_data[7:1]};
-                main_tx_data_rs232phytx_next_value_ce2 <= 1'd1;
-                if ((main_tx_count == 4'd9)) begin
-                    main_tx_sink_ready <= 1'd1;
+            main_minimalsoc_tx_enable <= 1'd1;
+            if (main_minimalsoc_tx_tick) begin
+                main_minimalsoc_serial_tx_rs232phytx_next_value1 <= main_minimalsoc_tx_data[0];
+                main_minimalsoc_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
+                main_minimalsoc_tx_count_rs232phytx_next_value0 <= (main_minimalsoc_tx_count + 1'd1);
+                main_minimalsoc_tx_count_rs232phytx_next_value_ce0 <= 1'd1;
+                main_minimalsoc_tx_data_rs232phytx_next_value2 <= {1'd1, main_minimalsoc_tx_data[7:1]};
+                main_minimalsoc_tx_data_rs232phytx_next_value_ce2 <= 1'd1;
+                if ((main_minimalsoc_tx_count == 4'd9)) begin
+                    main_minimalsoc_tx_sink_ready <= 1'd1;
                     builder_rs232phytx_next_state <= 1'd0;
                 end
             end
         end
         default: begin
-            main_tx_count_rs232phytx_next_value0 <= 1'd0;
-            main_tx_count_rs232phytx_next_value_ce0 <= 1'd1;
-            main_serial_tx_rs232phytx_next_value1 <= 1'd1;
-            main_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
-            if (main_tx_sink_valid) begin
-                main_serial_tx_rs232phytx_next_value1 <= 1'd0;
-                main_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
-                main_tx_data_rs232phytx_next_value2 <= main_tx_sink_payload_data;
-                main_tx_data_rs232phytx_next_value_ce2 <= 1'd1;
+            main_minimalsoc_tx_count_rs232phytx_next_value0 <= 1'd0;
+            main_minimalsoc_tx_count_rs232phytx_next_value_ce0 <= 1'd1;
+            main_minimalsoc_serial_tx_rs232phytx_next_value1 <= 1'd1;
+            main_minimalsoc_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
+            if (main_minimalsoc_tx_sink_valid) begin
+                main_minimalsoc_serial_tx_rs232phytx_next_value1 <= 1'd0;
+                main_minimalsoc_serial_tx_rs232phytx_next_value_ce1 <= 1'd1;
+                main_minimalsoc_tx_data_rs232phytx_next_value2 <= main_minimalsoc_tx_sink_payload_data;
+                main_minimalsoc_tx_data_rs232phytx_next_value_ce2 <= 1'd1;
                 builder_rs232phytx_next_state <= 1'd1;
             end
         end
@@ -607,148 +723,159 @@ always @(*) begin
 end
 always @(*) begin
     builder_rs232phyrx_next_state <= 1'd0;
-    main_rx_count_rs232phyrx_next_value0 <= 4'd0;
-    main_rx_count_rs232phyrx_next_value_ce0 <= 1'd0;
-    main_rx_data_rs232phyrx_next_value1 <= 8'd0;
-    main_rx_data_rs232phyrx_next_value_ce1 <= 1'd0;
-    main_rx_enable <= 1'd0;
-    main_rx_source_payload_data <= 8'd0;
-    main_rx_source_valid <= 1'd0;
+    main_minimalsoc_rx_count_rs232phyrx_next_value0 <= 4'd0;
+    main_minimalsoc_rx_count_rs232phyrx_next_value_ce0 <= 1'd0;
+    main_minimalsoc_rx_data_rs232phyrx_next_value1 <= 8'd0;
+    main_minimalsoc_rx_data_rs232phyrx_next_value_ce1 <= 1'd0;
+    main_minimalsoc_rx_enable <= 1'd0;
+    main_minimalsoc_rx_source_payload_data <= 8'd0;
+    main_minimalsoc_rx_source_valid <= 1'd0;
     builder_rs232phyrx_next_state <= builder_rs232phyrx_state;
     case (builder_rs232phyrx_state)
         1'd1: begin
-            main_rx_enable <= 1'd1;
-            if (main_rx_tick) begin
-                main_rx_count_rs232phyrx_next_value0 <= (main_rx_count + 1'd1);
-                main_rx_count_rs232phyrx_next_value_ce0 <= 1'd1;
-                main_rx_data_rs232phyrx_next_value1 <= {main_rx_rx, main_rx_data[7:1]};
-                main_rx_data_rs232phyrx_next_value_ce1 <= 1'd1;
-                if ((main_rx_count == 4'd9)) begin
-                    main_rx_source_valid <= (main_rx_rx == 1'd1);
-                    main_rx_source_payload_data <= main_rx_data;
+            main_minimalsoc_rx_enable <= 1'd1;
+            if (main_minimalsoc_rx_tick) begin
+                main_minimalsoc_rx_count_rs232phyrx_next_value0 <= (main_minimalsoc_rx_count + 1'd1);
+                main_minimalsoc_rx_count_rs232phyrx_next_value_ce0 <= 1'd1;
+                main_minimalsoc_rx_data_rs232phyrx_next_value1 <= {main_minimalsoc_rx_rx, main_minimalsoc_rx_data[7:1]};
+                main_minimalsoc_rx_data_rs232phyrx_next_value_ce1 <= 1'd1;
+                if ((main_minimalsoc_rx_count == 4'd9)) begin
+                    main_minimalsoc_rx_source_valid <= (main_minimalsoc_rx_rx == 1'd1);
+                    main_minimalsoc_rx_source_payload_data <= main_minimalsoc_rx_data;
                     builder_rs232phyrx_next_state <= 1'd0;
                 end
             end
         end
         default: begin
-            main_rx_count_rs232phyrx_next_value0 <= 1'd0;
-            main_rx_count_rs232phyrx_next_value_ce0 <= 1'd1;
-            if (((main_rx_rx == 1'd0) & (main_rx_rx_d == 1'd1))) begin
+            main_minimalsoc_rx_count_rs232phyrx_next_value0 <= 1'd0;
+            main_minimalsoc_rx_count_rs232phyrx_next_value_ce0 <= 1'd1;
+            if (((main_minimalsoc_rx_rx == 1'd0) & (main_minimalsoc_rx_rx_d == 1'd1))) begin
                 builder_rs232phyrx_next_state <= 1'd1;
             end
         end
     endcase
 end
-assign main_uart_sink_valid = main_rx_source_valid;
-assign main_rx_source_ready = main_uart_sink_ready;
-assign main_uart_sink_first = main_rx_source_first;
-assign main_uart_sink_last = main_rx_source_last;
-assign main_uart_sink_payload_data = main_rx_source_payload_data;
-assign main_tx_sink_valid = main_uart_source_valid;
-assign main_uart_source_ready = main_tx_sink_ready;
-assign main_tx_sink_first = main_uart_source_first;
-assign main_tx_sink_last = main_uart_source_last;
-assign main_tx_sink_payload_data = main_uart_source_payload_data;
-assign main_tx_fifo_sink_valid = main_rxtx_re;
-assign main_tx_fifo_sink_payload_data = main_rxtx_r;
-assign main_uart_source_valid = main_tx_fifo_source_valid;
-assign main_tx_fifo_source_ready = main_uart_source_ready;
-assign main_uart_source_first = main_tx_fifo_source_first;
-assign main_uart_source_last = main_tx_fifo_source_last;
-assign main_uart_source_payload_data = main_tx_fifo_source_payload_data;
-assign main_txfull_status = (~main_tx_fifo_sink_ready);
-assign main_txempty_status = (~main_tx_fifo_source_valid);
-assign main_tx_trigger = main_tx_fifo_sink_ready;
-assign main_rx_fifo_sink_valid = main_uart_sink_valid;
-assign main_uart_sink_ready = main_rx_fifo_sink_ready;
-assign main_rx_fifo_sink_first = main_uart_sink_first;
-assign main_rx_fifo_sink_last = main_uart_sink_last;
-assign main_rx_fifo_sink_payload_data = main_uart_sink_payload_data;
-assign main_rxtx_w = main_rx_fifo_source_payload_data;
-assign main_rx_fifo_source_ready = (main_rx_clear | (1'd0 & main_rxtx_we));
-assign main_rxempty_status = (~main_rx_fifo_source_valid);
-assign main_rxfull_status = (~main_rx_fifo_sink_ready);
-assign main_rx_trigger = main_rx_fifo_source_valid;
-assign main_tx0 = main_tx_status;
-assign main_tx1 = main_tx_pending;
+assign main_minimalsoc_uart_sink_valid = main_minimalsoc_rx_source_valid;
+assign main_minimalsoc_rx_source_ready = main_minimalsoc_uart_sink_ready;
+assign main_minimalsoc_uart_sink_first = main_minimalsoc_rx_source_first;
+assign main_minimalsoc_uart_sink_last = main_minimalsoc_rx_source_last;
+assign main_minimalsoc_uart_sink_payload_data = main_minimalsoc_rx_source_payload_data;
+assign main_minimalsoc_tx_sink_valid = main_minimalsoc_uart_source_valid;
+assign main_minimalsoc_uart_source_ready = main_minimalsoc_tx_sink_ready;
+assign main_minimalsoc_tx_sink_first = main_minimalsoc_uart_source_first;
+assign main_minimalsoc_tx_sink_last = main_minimalsoc_uart_source_last;
+assign main_minimalsoc_tx_sink_payload_data = main_minimalsoc_uart_source_payload_data;
+assign main_minimalsoc_tx_fifo_sink_valid = main_minimalsoc_rxtx_re;
+assign main_minimalsoc_tx_fifo_sink_payload_data = main_minimalsoc_rxtx_r;
+assign main_minimalsoc_uart_source_valid = main_minimalsoc_tx_fifo_source_valid;
+assign main_minimalsoc_tx_fifo_source_ready = main_minimalsoc_uart_source_ready;
+assign main_minimalsoc_uart_source_first = main_minimalsoc_tx_fifo_source_first;
+assign main_minimalsoc_uart_source_last = main_minimalsoc_tx_fifo_source_last;
+assign main_minimalsoc_uart_source_payload_data = main_minimalsoc_tx_fifo_source_payload_data;
+assign main_minimalsoc_txfull_status = (~main_minimalsoc_tx_fifo_sink_ready);
+assign main_minimalsoc_txempty_status = (~main_minimalsoc_tx_fifo_source_valid);
+assign main_minimalsoc_tx_trigger = main_minimalsoc_tx_fifo_sink_ready;
+assign main_minimalsoc_rx_fifo_sink_valid = main_minimalsoc_uart_sink_valid;
+assign main_minimalsoc_uart_sink_ready = main_minimalsoc_rx_fifo_sink_ready;
+assign main_minimalsoc_rx_fifo_sink_first = main_minimalsoc_uart_sink_first;
+assign main_minimalsoc_rx_fifo_sink_last = main_minimalsoc_uart_sink_last;
+assign main_minimalsoc_rx_fifo_sink_payload_data = main_minimalsoc_uart_sink_payload_data;
+assign main_minimalsoc_rxtx_w = main_minimalsoc_rx_fifo_source_payload_data;
+assign main_minimalsoc_rx_fifo_source_ready = (main_minimalsoc_rx_clear | (1'd0 & main_minimalsoc_rxtx_we));
+assign main_minimalsoc_rxempty_status = (~main_minimalsoc_rx_fifo_source_valid);
+assign main_minimalsoc_rxfull_status = (~main_minimalsoc_rx_fifo_sink_ready);
+assign main_minimalsoc_rx_trigger = main_minimalsoc_rx_fifo_source_valid;
+assign main_minimalsoc_tx0 = main_minimalsoc_tx_status;
+assign main_minimalsoc_tx1 = main_minimalsoc_tx_pending;
 always @(*) begin
-    main_tx_clear <= 1'd0;
-    if ((main_pending_re & main_pending_r[0])) begin
-        main_tx_clear <= 1'd1;
+    main_minimalsoc_tx_clear <= 1'd0;
+    if ((main_minimalsoc_pending_re & main_minimalsoc_pending_r[0])) begin
+        main_minimalsoc_tx_clear <= 1'd1;
     end
 end
-assign main_rx0 = main_rx_status;
-assign main_rx1 = main_rx_pending;
+assign main_minimalsoc_rx0 = main_minimalsoc_rx_status;
+assign main_minimalsoc_rx1 = main_minimalsoc_rx_pending;
 always @(*) begin
-    main_rx_clear <= 1'd0;
-    if ((main_pending_re & main_pending_r[1])) begin
-        main_rx_clear <= 1'd1;
+    main_minimalsoc_rx_clear <= 1'd0;
+    if ((main_minimalsoc_pending_re & main_minimalsoc_pending_r[1])) begin
+        main_minimalsoc_rx_clear <= 1'd1;
     end
 end
-assign main_irq = ((main_pending_status[0] & main_enable_storage[0]) | (main_pending_status[1] & main_enable_storage[1]));
-assign main_tx_status = main_tx_trigger;
-assign main_rx_status = main_rx_trigger;
-assign main_tx_fifo_syncfifo_din = {main_tx_fifo_fifo_in_last, main_tx_fifo_fifo_in_first, main_tx_fifo_fifo_in_payload_data};
-assign {main_tx_fifo_fifo_out_last, main_tx_fifo_fifo_out_first, main_tx_fifo_fifo_out_payload_data} = main_tx_fifo_syncfifo_dout;
-assign main_tx_fifo_sink_ready = main_tx_fifo_syncfifo_writable;
-assign main_tx_fifo_syncfifo_we = main_tx_fifo_sink_valid;
-assign main_tx_fifo_fifo_in_first = main_tx_fifo_sink_first;
-assign main_tx_fifo_fifo_in_last = main_tx_fifo_sink_last;
-assign main_tx_fifo_fifo_in_payload_data = main_tx_fifo_sink_payload_data;
-assign main_tx_fifo_source_valid = main_tx_fifo_readable;
-assign main_tx_fifo_source_first = main_tx_fifo_fifo_out_first;
-assign main_tx_fifo_source_last = main_tx_fifo_fifo_out_last;
-assign main_tx_fifo_source_payload_data = main_tx_fifo_fifo_out_payload_data;
-assign main_tx_fifo_re = main_tx_fifo_source_ready;
-assign main_tx_fifo_syncfifo_re = (main_tx_fifo_syncfifo_readable & ((~main_tx_fifo_readable) | main_tx_fifo_re));
-assign main_tx_fifo_level1 = (main_tx_fifo_level0 + main_tx_fifo_readable);
+assign main_minimalsoc_irq = ((main_minimalsoc_pending_status[0] & main_minimalsoc_enable_storage[0]) | (main_minimalsoc_pending_status[1] & main_minimalsoc_enable_storage[1]));
+assign main_minimalsoc_tx_status = main_minimalsoc_tx_trigger;
+assign main_minimalsoc_rx_status = main_minimalsoc_rx_trigger;
+assign main_minimalsoc_tx_fifo_syncfifo_din = {main_minimalsoc_tx_fifo_fifo_in_last, main_minimalsoc_tx_fifo_fifo_in_first, main_minimalsoc_tx_fifo_fifo_in_payload_data};
+assign {main_minimalsoc_tx_fifo_fifo_out_last, main_minimalsoc_tx_fifo_fifo_out_first, main_minimalsoc_tx_fifo_fifo_out_payload_data} = main_minimalsoc_tx_fifo_syncfifo_dout;
+assign main_minimalsoc_tx_fifo_sink_ready = main_minimalsoc_tx_fifo_syncfifo_writable;
+assign main_minimalsoc_tx_fifo_syncfifo_we = main_minimalsoc_tx_fifo_sink_valid;
+assign main_minimalsoc_tx_fifo_fifo_in_first = main_minimalsoc_tx_fifo_sink_first;
+assign main_minimalsoc_tx_fifo_fifo_in_last = main_minimalsoc_tx_fifo_sink_last;
+assign main_minimalsoc_tx_fifo_fifo_in_payload_data = main_minimalsoc_tx_fifo_sink_payload_data;
+assign main_minimalsoc_tx_fifo_source_valid = main_minimalsoc_tx_fifo_readable;
+assign main_minimalsoc_tx_fifo_source_first = main_minimalsoc_tx_fifo_fifo_out_first;
+assign main_minimalsoc_tx_fifo_source_last = main_minimalsoc_tx_fifo_fifo_out_last;
+assign main_minimalsoc_tx_fifo_source_payload_data = main_minimalsoc_tx_fifo_fifo_out_payload_data;
+assign main_minimalsoc_tx_fifo_re = main_minimalsoc_tx_fifo_source_ready;
+assign main_minimalsoc_tx_fifo_syncfifo_re = (main_minimalsoc_tx_fifo_syncfifo_readable & ((~main_minimalsoc_tx_fifo_readable) | main_minimalsoc_tx_fifo_re));
+assign main_minimalsoc_tx_fifo_level1 = (main_minimalsoc_tx_fifo_level0 + main_minimalsoc_tx_fifo_readable);
 always @(*) begin
-    main_tx_fifo_wrport_adr <= 4'd0;
-    if (main_tx_fifo_replace) begin
-        main_tx_fifo_wrport_adr <= (main_tx_fifo_produce - 1'd1);
+    main_minimalsoc_tx_fifo_wrport_adr <= 4'd0;
+    if (main_minimalsoc_tx_fifo_replace) begin
+        main_minimalsoc_tx_fifo_wrport_adr <= (main_minimalsoc_tx_fifo_produce - 1'd1);
     end else begin
-        main_tx_fifo_wrport_adr <= main_tx_fifo_produce;
+        main_minimalsoc_tx_fifo_wrport_adr <= main_minimalsoc_tx_fifo_produce;
     end
 end
-assign main_tx_fifo_wrport_dat_w = main_tx_fifo_syncfifo_din;
-assign main_tx_fifo_wrport_we = (main_tx_fifo_syncfifo_we & (main_tx_fifo_syncfifo_writable | main_tx_fifo_replace));
-assign main_tx_fifo_do_read = (main_tx_fifo_syncfifo_readable & main_tx_fifo_syncfifo_re);
-assign main_tx_fifo_rdport_adr = main_tx_fifo_consume;
-assign main_tx_fifo_syncfifo_dout = main_tx_fifo_rdport_dat_r;
-assign main_tx_fifo_rdport_re = main_tx_fifo_do_read;
-assign main_tx_fifo_syncfifo_writable = (main_tx_fifo_level0 != 5'd16);
-assign main_tx_fifo_syncfifo_readable = (main_tx_fifo_level0 != 1'd0);
-assign main_rx_fifo_syncfifo_din = {main_rx_fifo_fifo_in_last, main_rx_fifo_fifo_in_first, main_rx_fifo_fifo_in_payload_data};
-assign {main_rx_fifo_fifo_out_last, main_rx_fifo_fifo_out_first, main_rx_fifo_fifo_out_payload_data} = main_rx_fifo_syncfifo_dout;
-assign main_rx_fifo_sink_ready = main_rx_fifo_syncfifo_writable;
-assign main_rx_fifo_syncfifo_we = main_rx_fifo_sink_valid;
-assign main_rx_fifo_fifo_in_first = main_rx_fifo_sink_first;
-assign main_rx_fifo_fifo_in_last = main_rx_fifo_sink_last;
-assign main_rx_fifo_fifo_in_payload_data = main_rx_fifo_sink_payload_data;
-assign main_rx_fifo_source_valid = main_rx_fifo_readable;
-assign main_rx_fifo_source_first = main_rx_fifo_fifo_out_first;
-assign main_rx_fifo_source_last = main_rx_fifo_fifo_out_last;
-assign main_rx_fifo_source_payload_data = main_rx_fifo_fifo_out_payload_data;
-assign main_rx_fifo_re = main_rx_fifo_source_ready;
-assign main_rx_fifo_syncfifo_re = (main_rx_fifo_syncfifo_readable & ((~main_rx_fifo_readable) | main_rx_fifo_re));
-assign main_rx_fifo_level1 = (main_rx_fifo_level0 + main_rx_fifo_readable);
+assign main_minimalsoc_tx_fifo_wrport_dat_w = main_minimalsoc_tx_fifo_syncfifo_din;
+assign main_minimalsoc_tx_fifo_wrport_we = (main_minimalsoc_tx_fifo_syncfifo_we & (main_minimalsoc_tx_fifo_syncfifo_writable | main_minimalsoc_tx_fifo_replace));
+assign main_minimalsoc_tx_fifo_do_read = (main_minimalsoc_tx_fifo_syncfifo_readable & main_minimalsoc_tx_fifo_syncfifo_re);
+assign main_minimalsoc_tx_fifo_rdport_adr = main_minimalsoc_tx_fifo_consume;
+assign main_minimalsoc_tx_fifo_syncfifo_dout = main_minimalsoc_tx_fifo_rdport_dat_r;
+assign main_minimalsoc_tx_fifo_rdport_re = main_minimalsoc_tx_fifo_do_read;
+assign main_minimalsoc_tx_fifo_syncfifo_writable = (main_minimalsoc_tx_fifo_level0 != 5'd16);
+assign main_minimalsoc_tx_fifo_syncfifo_readable = (main_minimalsoc_tx_fifo_level0 != 1'd0);
+assign main_minimalsoc_rx_fifo_syncfifo_din = {main_minimalsoc_rx_fifo_fifo_in_last, main_minimalsoc_rx_fifo_fifo_in_first, main_minimalsoc_rx_fifo_fifo_in_payload_data};
+assign {main_minimalsoc_rx_fifo_fifo_out_last, main_minimalsoc_rx_fifo_fifo_out_first, main_minimalsoc_rx_fifo_fifo_out_payload_data} = main_minimalsoc_rx_fifo_syncfifo_dout;
+assign main_minimalsoc_rx_fifo_sink_ready = main_minimalsoc_rx_fifo_syncfifo_writable;
+assign main_minimalsoc_rx_fifo_syncfifo_we = main_minimalsoc_rx_fifo_sink_valid;
+assign main_minimalsoc_rx_fifo_fifo_in_first = main_minimalsoc_rx_fifo_sink_first;
+assign main_minimalsoc_rx_fifo_fifo_in_last = main_minimalsoc_rx_fifo_sink_last;
+assign main_minimalsoc_rx_fifo_fifo_in_payload_data = main_minimalsoc_rx_fifo_sink_payload_data;
+assign main_minimalsoc_rx_fifo_source_valid = main_minimalsoc_rx_fifo_readable;
+assign main_minimalsoc_rx_fifo_source_first = main_minimalsoc_rx_fifo_fifo_out_first;
+assign main_minimalsoc_rx_fifo_source_last = main_minimalsoc_rx_fifo_fifo_out_last;
+assign main_minimalsoc_rx_fifo_source_payload_data = main_minimalsoc_rx_fifo_fifo_out_payload_data;
+assign main_minimalsoc_rx_fifo_re = main_minimalsoc_rx_fifo_source_ready;
+assign main_minimalsoc_rx_fifo_syncfifo_re = (main_minimalsoc_rx_fifo_syncfifo_readable & ((~main_minimalsoc_rx_fifo_readable) | main_minimalsoc_rx_fifo_re));
+assign main_minimalsoc_rx_fifo_level1 = (main_minimalsoc_rx_fifo_level0 + main_minimalsoc_rx_fifo_readable);
 always @(*) begin
-    main_rx_fifo_wrport_adr <= 4'd0;
-    if (main_rx_fifo_replace) begin
-        main_rx_fifo_wrport_adr <= (main_rx_fifo_produce - 1'd1);
+    main_minimalsoc_rx_fifo_wrport_adr <= 4'd0;
+    if (main_minimalsoc_rx_fifo_replace) begin
+        main_minimalsoc_rx_fifo_wrport_adr <= (main_minimalsoc_rx_fifo_produce - 1'd1);
     end else begin
-        main_rx_fifo_wrport_adr <= main_rx_fifo_produce;
+        main_minimalsoc_rx_fifo_wrport_adr <= main_minimalsoc_rx_fifo_produce;
     end
 end
-assign main_rx_fifo_wrport_dat_w = main_rx_fifo_syncfifo_din;
-assign main_rx_fifo_wrport_we = (main_rx_fifo_syncfifo_we & (main_rx_fifo_syncfifo_writable | main_rx_fifo_replace));
-assign main_rx_fifo_do_read = (main_rx_fifo_syncfifo_readable & main_rx_fifo_syncfifo_re);
-assign main_rx_fifo_rdport_adr = main_rx_fifo_consume;
-assign main_rx_fifo_syncfifo_dout = main_rx_fifo_rdport_dat_r;
-assign main_rx_fifo_rdport_re = main_rx_fifo_do_read;
-assign main_rx_fifo_syncfifo_writable = (main_rx_fifo_level0 != 5'd16);
-assign main_rx_fifo_syncfifo_readable = (main_rx_fifo_level0 != 1'd0);
+assign main_minimalsoc_rx_fifo_wrport_dat_w = main_minimalsoc_rx_fifo_syncfifo_din;
+assign main_minimalsoc_rx_fifo_wrport_we = (main_minimalsoc_rx_fifo_syncfifo_we & (main_minimalsoc_rx_fifo_syncfifo_writable | main_minimalsoc_rx_fifo_replace));
+assign main_minimalsoc_rx_fifo_do_read = (main_minimalsoc_rx_fifo_syncfifo_readable & main_minimalsoc_rx_fifo_syncfifo_re);
+assign main_minimalsoc_rx_fifo_rdport_adr = main_minimalsoc_rx_fifo_consume;
+assign main_minimalsoc_rx_fifo_syncfifo_dout = main_minimalsoc_rx_fifo_rdport_dat_r;
+assign main_minimalsoc_rx_fifo_rdport_re = main_minimalsoc_rx_fifo_do_read;
+assign main_minimalsoc_rx_fifo_syncfifo_writable = (main_minimalsoc_rx_fifo_level0 != 5'd16);
+assign main_minimalsoc_rx_fifo_syncfifo_readable = (main_minimalsoc_rx_fifo_level0 != 1'd0);
 assign {led_blue, led_green, led_red} = main_storage;
+assign main_timer0_zero_trigger = (main_timer0_value == 1'd0);
+assign main_timer0_zero0 = main_timer0_zero_status;
+assign main_timer0_zero1 = main_timer0_zero_pending;
+always @(*) begin
+    main_timer0_zero_clear <= 1'd0;
+    if ((main_timer0_pending_re & main_timer0_pending_r)) begin
+        main_timer0_zero_clear <= 1'd1;
+    end
+end
+assign main_timer0_irq = (main_timer0_pending_status & main_timer0_enable_storage);
+assign main_timer0_zero_status = main_timer0_zero_trigger;
 always @(*) begin
     builder_interface0_ack <= 1'd0;
     builder_interface0_dat_r <= 32'd0;
@@ -775,7 +902,7 @@ always @(*) begin
         end
     endcase
 end
-assign builder_csrbank0_sel = (builder_interface0_bank_bus_adr[13:9] == 1'd1);
+assign builder_csrbank0_sel = (builder_interface0_bank_bus_adr[13:9] == 2'd2);
 assign builder_csrbank0_reset0_r = builder_interface0_bank_bus_dat_w[1:0];
 always @(*) begin
     builder_csrbank0_reset0_re <= 1'd0;
@@ -804,16 +931,16 @@ always @(*) begin
     end
 end
 always @(*) begin
-    main_soc_rst <= 1'd0;
-    if (main_reset_re) begin
-        main_soc_rst <= main_reset_storage[0];
+    main_minimalsoc_soc_rst <= 1'd0;
+    if (main_minimalsoc_reset_re) begin
+        main_minimalsoc_soc_rst <= main_minimalsoc_reset_storage[0];
     end
 end
-assign main_cpu_rst = main_reset_storage[1];
-assign builder_csrbank0_reset0_w = main_reset_storage;
-assign builder_csrbank0_scratch0_w = main_scratch_storage;
-assign builder_csrbank0_bus_errors_w = main_bus_errors_status;
-assign main_bus_errors_we = builder_csrbank0_bus_errors_we;
+assign main_minimalsoc_cpu_rst = main_minimalsoc_reset_storage[1];
+assign builder_csrbank0_reset0_w = main_minimalsoc_reset_storage;
+assign builder_csrbank0_scratch0_w = main_minimalsoc_scratch_storage;
+assign builder_csrbank0_bus_errors_w = main_minimalsoc_bus_errors_status;
+assign main_minimalsoc_bus_errors_we = builder_csrbank0_bus_errors_we;
 assign builder_csrbank1_sel = (builder_interface1_bank_bus_adr[13:9] == 1'd0);
 assign builder_csrbank1_out0_r = builder_interface1_bank_bus_dat_w[2:0];
 always @(*) begin
@@ -825,14 +952,14 @@ always @(*) begin
     end
 end
 assign builder_csrbank1_out0_w = main_storage;
-assign builder_csrbank2_sel = (builder_interface2_bank_bus_adr[13:9] == 2'd2);
-assign main_rxtx_r = builder_interface2_bank_bus_dat_w[7:0];
+assign builder_csrbank2_sel = (builder_interface2_bank_bus_adr[13:9] == 2'd3);
+assign main_minimalsoc_rxtx_r = builder_interface2_bank_bus_dat_w[7:0];
 always @(*) begin
-    main_rxtx_re <= 1'd0;
-    main_rxtx_we <= 1'd0;
+    main_minimalsoc_rxtx_re <= 1'd0;
+    main_minimalsoc_rxtx_we <= 1'd0;
     if ((builder_csrbank2_sel & (builder_interface2_bank_bus_adr[8:0] == 1'd0))) begin
-        main_rxtx_re <= builder_interface2_bank_bus_we;
-        main_rxtx_we <= builder_interface2_bank_bus_re;
+        main_minimalsoc_rxtx_re <= builder_interface2_bank_bus_we;
+        main_minimalsoc_rxtx_we <= builder_interface2_bank_bus_re;
     end
 end
 assign builder_csrbank2_txfull_r = builder_interface2_bank_bus_dat_w[0];
@@ -898,31 +1025,118 @@ always @(*) begin
         builder_csrbank2_rxfull_we <= builder_interface2_bank_bus_re;
     end
 end
-assign builder_csrbank2_txfull_w = main_txfull_status;
-assign main_txfull_we = builder_csrbank2_txfull_we;
-assign builder_csrbank2_rxempty_w = main_rxempty_status;
-assign main_rxempty_we = builder_csrbank2_rxempty_we;
+assign builder_csrbank2_txfull_w = main_minimalsoc_txfull_status;
+assign main_minimalsoc_txfull_we = builder_csrbank2_txfull_we;
+assign builder_csrbank2_rxempty_w = main_minimalsoc_rxempty_status;
+assign main_minimalsoc_rxempty_we = builder_csrbank2_rxempty_we;
 always @(*) begin
-    main_status_status <= 2'd0;
-    main_status_status[0] <= main_tx0;
-    main_status_status[1] <= main_rx0;
+    main_minimalsoc_status_status <= 2'd0;
+    main_minimalsoc_status_status[0] <= main_minimalsoc_tx0;
+    main_minimalsoc_status_status[1] <= main_minimalsoc_rx0;
 end
-assign builder_csrbank2_ev_status_w = main_status_status;
-assign main_status_we = builder_csrbank2_ev_status_we;
+assign builder_csrbank2_ev_status_w = main_minimalsoc_status_status;
+assign main_minimalsoc_status_we = builder_csrbank2_ev_status_we;
 always @(*) begin
-    main_pending_status <= 2'd0;
-    main_pending_status[0] <= main_tx1;
-    main_pending_status[1] <= main_rx1;
+    main_minimalsoc_pending_status <= 2'd0;
+    main_minimalsoc_pending_status[0] <= main_minimalsoc_tx1;
+    main_minimalsoc_pending_status[1] <= main_minimalsoc_rx1;
 end
-assign builder_csrbank2_ev_pending_w = main_pending_status;
-assign main_pending_we = builder_csrbank2_ev_pending_we;
-assign main_tx2 = main_enable_storage[0];
-assign main_rx2 = main_enable_storage[1];
-assign builder_csrbank2_ev_enable0_w = main_enable_storage;
-assign builder_csrbank2_txempty_w = main_txempty_status;
-assign main_txempty_we = builder_csrbank2_txempty_we;
-assign builder_csrbank2_rxfull_w = main_rxfull_status;
-assign main_rxfull_we = builder_csrbank2_rxfull_we;
+assign builder_csrbank2_ev_pending_w = main_minimalsoc_pending_status;
+assign main_minimalsoc_pending_we = builder_csrbank2_ev_pending_we;
+assign main_minimalsoc_tx2 = main_minimalsoc_enable_storage[0];
+assign main_minimalsoc_rx2 = main_minimalsoc_enable_storage[1];
+assign builder_csrbank2_ev_enable0_w = main_minimalsoc_enable_storage;
+assign builder_csrbank2_txempty_w = main_minimalsoc_txempty_status;
+assign main_minimalsoc_txempty_we = builder_csrbank2_txempty_we;
+assign builder_csrbank2_rxfull_w = main_minimalsoc_rxfull_status;
+assign main_minimalsoc_rxfull_we = builder_csrbank2_rxfull_we;
+assign builder_csrbank3_sel = (builder_interface3_bank_bus_adr[13:9] == 1'd1);
+assign builder_csrbank3_load0_r = builder_interface3_bank_bus_dat_w;
+always @(*) begin
+    builder_csrbank3_load0_re <= 1'd0;
+    builder_csrbank3_load0_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 1'd0))) begin
+        builder_csrbank3_load0_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_load0_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_reload0_r = builder_interface3_bank_bus_dat_w;
+always @(*) begin
+    builder_csrbank3_reload0_re <= 1'd0;
+    builder_csrbank3_reload0_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 1'd1))) begin
+        builder_csrbank3_reload0_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_reload0_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_en0_r = builder_interface3_bank_bus_dat_w[0];
+always @(*) begin
+    builder_csrbank3_en0_re <= 1'd0;
+    builder_csrbank3_en0_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 2'd2))) begin
+        builder_csrbank3_en0_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_en0_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_update_value0_r = builder_interface3_bank_bus_dat_w[0];
+always @(*) begin
+    builder_csrbank3_update_value0_re <= 1'd0;
+    builder_csrbank3_update_value0_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 2'd3))) begin
+        builder_csrbank3_update_value0_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_update_value0_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_value_r = builder_interface3_bank_bus_dat_w;
+always @(*) begin
+    builder_csrbank3_value_re <= 1'd0;
+    builder_csrbank3_value_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 3'd4))) begin
+        builder_csrbank3_value_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_value_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_ev_status_r = builder_interface3_bank_bus_dat_w[0];
+always @(*) begin
+    builder_csrbank3_ev_status_re <= 1'd0;
+    builder_csrbank3_ev_status_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 3'd5))) begin
+        builder_csrbank3_ev_status_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_ev_status_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_ev_pending_r = builder_interface3_bank_bus_dat_w[0];
+always @(*) begin
+    builder_csrbank3_ev_pending_re <= 1'd0;
+    builder_csrbank3_ev_pending_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 3'd6))) begin
+        builder_csrbank3_ev_pending_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_ev_pending_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_ev_enable0_r = builder_interface3_bank_bus_dat_w[0];
+always @(*) begin
+    builder_csrbank3_ev_enable0_re <= 1'd0;
+    builder_csrbank3_ev_enable0_we <= 1'd0;
+    if ((builder_csrbank3_sel & (builder_interface3_bank_bus_adr[8:0] == 3'd7))) begin
+        builder_csrbank3_ev_enable0_re <= builder_interface3_bank_bus_we;
+        builder_csrbank3_ev_enable0_we <= builder_interface3_bank_bus_re;
+    end
+end
+assign builder_csrbank3_load0_w = main_timer0_load_storage;
+assign builder_csrbank3_reload0_w = main_timer0_reload_storage;
+assign builder_csrbank3_en0_w = main_timer0_en_storage;
+assign builder_csrbank3_update_value0_w = main_timer0_update_value_storage;
+assign builder_csrbank3_value_w = main_timer0_value_status;
+assign main_timer0_value_we = builder_csrbank3_value_we;
+assign main_timer0_status_status = main_timer0_zero0;
+assign builder_csrbank3_ev_status_w = main_timer0_status_status;
+assign main_timer0_status_we = builder_csrbank3_ev_status_we;
+assign main_timer0_pending_status = main_timer0_zero1;
+assign builder_csrbank3_ev_pending_w = main_timer0_pending_status;
+assign main_timer0_pending_we = builder_csrbank3_ev_pending_we;
+assign main_timer0_zero2 = main_timer0_enable_storage;
+assign builder_csrbank3_ev_enable0_w = main_timer0_enable_storage;
 assign builder_adr = builder_interface1_adr;
 assign builder_re = builder_interface1_re;
 assign builder_we = builder_interface1_we;
@@ -931,21 +1145,25 @@ assign builder_interface1_dat_r = builder_dat_r;
 assign builder_interface0_bank_bus_adr = builder_adr;
 assign builder_interface1_bank_bus_adr = builder_adr;
 assign builder_interface2_bank_bus_adr = builder_adr;
+assign builder_interface3_bank_bus_adr = builder_adr;
 assign builder_interface0_bank_bus_re = builder_re;
 assign builder_interface1_bank_bus_re = builder_re;
 assign builder_interface2_bank_bus_re = builder_re;
+assign builder_interface3_bank_bus_re = builder_re;
 assign builder_interface0_bank_bus_we = builder_we;
 assign builder_interface1_bank_bus_we = builder_we;
 assign builder_interface2_bank_bus_we = builder_we;
+assign builder_interface3_bank_bus_we = builder_we;
 assign builder_interface0_bank_bus_dat_w = builder_dat_w;
 assign builder_interface1_bank_bus_dat_w = builder_dat_w;
 assign builder_interface2_bank_bus_dat_w = builder_dat_w;
-assign builder_dat_r = ((builder_interface0_bank_bus_dat_r | builder_interface1_bank_bus_dat_r) | builder_interface2_bank_bus_dat_r);
+assign builder_interface3_bank_bus_dat_w = builder_dat_w;
+assign builder_dat_r = (((builder_interface0_bank_bus_dat_r | builder_interface1_bank_bus_dat_r) | builder_interface2_bank_bus_dat_r) | builder_interface3_bank_bus_dat_r);
 always @(*) begin
     builder_array_muxed0 <= 30'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed0 <= main_adapted_interface_adr;
+            builder_array_muxed0 <= main_minimalsoc_adapted_interface_adr;
         end
     endcase
 end
@@ -953,7 +1171,7 @@ always @(*) begin
     builder_array_muxed1 <= 32'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed1 <= main_adapted_interface_dat_w;
+            builder_array_muxed1 <= main_minimalsoc_adapted_interface_dat_w;
         end
     endcase
 end
@@ -961,7 +1179,7 @@ always @(*) begin
     builder_array_muxed2 <= 4'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed2 <= main_adapted_interface_sel;
+            builder_array_muxed2 <= main_minimalsoc_adapted_interface_sel;
         end
     endcase
 end
@@ -969,7 +1187,7 @@ always @(*) begin
     builder_array_muxed3 <= 1'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed3 <= main_adapted_interface_cyc;
+            builder_array_muxed3 <= main_minimalsoc_adapted_interface_cyc;
         end
     endcase
 end
@@ -977,7 +1195,7 @@ always @(*) begin
     builder_array_muxed4 <= 1'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed4 <= main_adapted_interface_stb;
+            builder_array_muxed4 <= main_minimalsoc_adapted_interface_stb;
         end
     endcase
 end
@@ -985,7 +1203,7 @@ always @(*) begin
     builder_array_muxed5 <= 1'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed5 <= main_adapted_interface_we;
+            builder_array_muxed5 <= main_minimalsoc_adapted_interface_we;
         end
     endcase
 end
@@ -993,7 +1211,7 @@ always @(*) begin
     builder_array_muxed6 <= 3'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed6 <= main_adapted_interface_cti;
+            builder_array_muxed6 <= main_minimalsoc_adapted_interface_cti;
         end
     endcase
 end
@@ -1001,11 +1219,11 @@ always @(*) begin
     builder_array_muxed7 <= 2'd0;
     case (builder_grant)
         default: begin
-            builder_array_muxed7 <= main_adapted_interface_bte;
+            builder_array_muxed7 <= main_minimalsoc_adapted_interface_bte;
         end
     endcase
 end
-assign main_rx_rx = builder_regs1;
+assign main_minimalsoc_rx_rx = builder_regs1;
 
 
 //------------------------------------------------------------------------------
@@ -1021,114 +1239,137 @@ always @(posedge sys_clk) begin
     end else begin
         builder_count <= 20'd1000000;
     end
-    if ((main_bus_errors != 32'd4294967295)) begin
-        if (main_bus_error) begin
-            main_bus_errors <= (main_bus_errors + 1'd1);
+    if ((main_minimalsoc_bus_errors != 32'd4294967295)) begin
+        if (main_minimalsoc_bus_error) begin
+            main_minimalsoc_bus_errors <= (main_minimalsoc_bus_errors + 1'd1);
         end
     end
-    if (main_latch) begin
-        main_mbus_rdata1 <= main_idbus_dat_r;
+    if (main_minimalsoc_latch) begin
+        main_minimalsoc_mbus_rdata1 <= main_minimalsoc_idbus_dat_r;
     end
     builder_femtorv_state <= builder_femtorv_next_state;
-    if (main_idbus_adr_next_value_ce0) begin
-        main_idbus_adr <= main_idbus_adr_next_value0;
+    if (main_minimalsoc_idbus_adr_next_value_ce0) begin
+        main_minimalsoc_idbus_adr <= main_minimalsoc_idbus_adr_next_value0;
     end
-    if (main_idbus_dat_w_next_value_ce1) begin
-        main_idbus_dat_w <= main_idbus_dat_w_next_value1;
+    if (main_minimalsoc_idbus_dat_w_next_value_ce1) begin
+        main_minimalsoc_idbus_dat_w <= main_minimalsoc_idbus_dat_w_next_value1;
     end
-    if (main_idbus_sel_next_value_ce2) begin
-        main_idbus_sel <= main_idbus_sel_next_value2;
+    if (main_minimalsoc_idbus_sel_next_value_ce2) begin
+        main_minimalsoc_idbus_sel <= main_minimalsoc_idbus_sel_next_value2;
     end
-    if (main_idbus_we_next_value_ce3) begin
-        main_idbus_we <= main_idbus_we_next_value3;
+    if (main_minimalsoc_idbus_we_next_value_ce3) begin
+        main_minimalsoc_idbus_we <= main_minimalsoc_idbus_we_next_value3;
     end
-    main_ram_bus_ack <= 1'd0;
-    if (((main_ram_bus_cyc & main_ram_bus_stb) & ((~main_ram_bus_ack) | main_adr_burst))) begin
-        main_ram_bus_ack <= 1'd1;
+    main_minimalsoc_minimalsoc_ram_bus_ack <= 1'd0;
+    if (((main_minimalsoc_minimalsoc_ram_bus_cyc & main_minimalsoc_minimalsoc_ram_bus_stb) & ((~main_minimalsoc_minimalsoc_ram_bus_ack) | main_minimalsoc_minimalsoc_adr_burst))) begin
+        main_minimalsoc_minimalsoc_ram_bus_ack <= 1'd1;
     end
-    {main_tx_tick, main_tx_phase} <= 26'd41231686;
-    if (main_tx_enable) begin
-        {main_tx_tick, main_tx_phase} <= (main_tx_phase + 26'd41231686);
+    main_minimalsoc_ram_bus_ram_bus_ack <= 1'd0;
+    if (((main_minimalsoc_ram_bus_ram_bus_cyc & main_minimalsoc_ram_bus_ram_bus_stb) & ((~main_minimalsoc_ram_bus_ram_bus_ack) | main_minimalsoc_ram_adr_burst))) begin
+        main_minimalsoc_ram_bus_ram_bus_ack <= 1'd1;
+    end
+    {main_minimalsoc_tx_tick, main_minimalsoc_tx_phase} <= 26'd41231686;
+    if (main_minimalsoc_tx_enable) begin
+        {main_minimalsoc_tx_tick, main_minimalsoc_tx_phase} <= (main_minimalsoc_tx_phase + 26'd41231686);
     end
     builder_rs232phytx_state <= builder_rs232phytx_next_state;
-    if (main_tx_count_rs232phytx_next_value_ce0) begin
-        main_tx_count <= main_tx_count_rs232phytx_next_value0;
+    if (main_minimalsoc_tx_count_rs232phytx_next_value_ce0) begin
+        main_minimalsoc_tx_count <= main_minimalsoc_tx_count_rs232phytx_next_value0;
     end
-    if (main_serial_tx_rs232phytx_next_value_ce1) begin
-        serial_tx <= main_serial_tx_rs232phytx_next_value1;
+    if (main_minimalsoc_serial_tx_rs232phytx_next_value_ce1) begin
+        serial_tx <= main_minimalsoc_serial_tx_rs232phytx_next_value1;
     end
-    if (main_tx_data_rs232phytx_next_value_ce2) begin
-        main_tx_data <= main_tx_data_rs232phytx_next_value2;
+    if (main_minimalsoc_tx_data_rs232phytx_next_value_ce2) begin
+        main_minimalsoc_tx_data <= main_minimalsoc_tx_data_rs232phytx_next_value2;
     end
-    main_rx_rx_d <= main_rx_rx;
-    {main_rx_tick, main_rx_phase} <= 32'd2147483648;
-    if (main_rx_enable) begin
-        {main_rx_tick, main_rx_phase} <= (main_rx_phase + 26'd41231686);
+    main_minimalsoc_rx_rx_d <= main_minimalsoc_rx_rx;
+    {main_minimalsoc_rx_tick, main_minimalsoc_rx_phase} <= 32'd2147483648;
+    if (main_minimalsoc_rx_enable) begin
+        {main_minimalsoc_rx_tick, main_minimalsoc_rx_phase} <= (main_minimalsoc_rx_phase + 26'd41231686);
     end
     builder_rs232phyrx_state <= builder_rs232phyrx_next_state;
-    if (main_rx_count_rs232phyrx_next_value_ce0) begin
-        main_rx_count <= main_rx_count_rs232phyrx_next_value0;
+    if (main_minimalsoc_rx_count_rs232phyrx_next_value_ce0) begin
+        main_minimalsoc_rx_count <= main_minimalsoc_rx_count_rs232phyrx_next_value0;
     end
-    if (main_rx_data_rs232phyrx_next_value_ce1) begin
-        main_rx_data <= main_rx_data_rs232phyrx_next_value1;
+    if (main_minimalsoc_rx_data_rs232phyrx_next_value_ce1) begin
+        main_minimalsoc_rx_data <= main_minimalsoc_rx_data_rs232phyrx_next_value1;
     end
-    if (main_tx_clear) begin
-        main_tx_pending <= 1'd0;
+    if (main_minimalsoc_tx_clear) begin
+        main_minimalsoc_tx_pending <= 1'd0;
     end
-    main_tx_trigger_d <= main_tx_trigger;
-    if ((main_tx_trigger & (~main_tx_trigger_d))) begin
-        main_tx_pending <= 1'd1;
+    main_minimalsoc_tx_trigger_d <= main_minimalsoc_tx_trigger;
+    if ((main_minimalsoc_tx_trigger & (~main_minimalsoc_tx_trigger_d))) begin
+        main_minimalsoc_tx_pending <= 1'd1;
     end
-    if (main_rx_clear) begin
-        main_rx_pending <= 1'd0;
+    if (main_minimalsoc_rx_clear) begin
+        main_minimalsoc_rx_pending <= 1'd0;
     end
-    main_rx_trigger_d <= main_rx_trigger;
-    if ((main_rx_trigger & (~main_rx_trigger_d))) begin
-        main_rx_pending <= 1'd1;
+    main_minimalsoc_rx_trigger_d <= main_minimalsoc_rx_trigger;
+    if ((main_minimalsoc_rx_trigger & (~main_minimalsoc_rx_trigger_d))) begin
+        main_minimalsoc_rx_pending <= 1'd1;
     end
-    if (main_tx_fifo_syncfifo_re) begin
-        main_tx_fifo_readable <= 1'd1;
+    if (main_minimalsoc_tx_fifo_syncfifo_re) begin
+        main_minimalsoc_tx_fifo_readable <= 1'd1;
     end else begin
-        if (main_tx_fifo_re) begin
-            main_tx_fifo_readable <= 1'd0;
+        if (main_minimalsoc_tx_fifo_re) begin
+            main_minimalsoc_tx_fifo_readable <= 1'd0;
         end
     end
-    if (((main_tx_fifo_syncfifo_we & main_tx_fifo_syncfifo_writable) & (~main_tx_fifo_replace))) begin
-        main_tx_fifo_produce <= (main_tx_fifo_produce + 1'd1);
+    if (((main_minimalsoc_tx_fifo_syncfifo_we & main_minimalsoc_tx_fifo_syncfifo_writable) & (~main_minimalsoc_tx_fifo_replace))) begin
+        main_minimalsoc_tx_fifo_produce <= (main_minimalsoc_tx_fifo_produce + 1'd1);
     end
-    if (main_tx_fifo_do_read) begin
-        main_tx_fifo_consume <= (main_tx_fifo_consume + 1'd1);
+    if (main_minimalsoc_tx_fifo_do_read) begin
+        main_minimalsoc_tx_fifo_consume <= (main_minimalsoc_tx_fifo_consume + 1'd1);
     end
-    if (((main_tx_fifo_syncfifo_we & main_tx_fifo_syncfifo_writable) & (~main_tx_fifo_replace))) begin
-        if ((~main_tx_fifo_do_read)) begin
-            main_tx_fifo_level0 <= (main_tx_fifo_level0 + 1'd1);
-        end
-    end else begin
-        if (main_tx_fifo_do_read) begin
-            main_tx_fifo_level0 <= (main_tx_fifo_level0 - 1'd1);
-        end
-    end
-    if (main_rx_fifo_syncfifo_re) begin
-        main_rx_fifo_readable <= 1'd1;
-    end else begin
-        if (main_rx_fifo_re) begin
-            main_rx_fifo_readable <= 1'd0;
-        end
-    end
-    if (((main_rx_fifo_syncfifo_we & main_rx_fifo_syncfifo_writable) & (~main_rx_fifo_replace))) begin
-        main_rx_fifo_produce <= (main_rx_fifo_produce + 1'd1);
-    end
-    if (main_rx_fifo_do_read) begin
-        main_rx_fifo_consume <= (main_rx_fifo_consume + 1'd1);
-    end
-    if (((main_rx_fifo_syncfifo_we & main_rx_fifo_syncfifo_writable) & (~main_rx_fifo_replace))) begin
-        if ((~main_rx_fifo_do_read)) begin
-            main_rx_fifo_level0 <= (main_rx_fifo_level0 + 1'd1);
+    if (((main_minimalsoc_tx_fifo_syncfifo_we & main_minimalsoc_tx_fifo_syncfifo_writable) & (~main_minimalsoc_tx_fifo_replace))) begin
+        if ((~main_minimalsoc_tx_fifo_do_read)) begin
+            main_minimalsoc_tx_fifo_level0 <= (main_minimalsoc_tx_fifo_level0 + 1'd1);
         end
     end else begin
-        if (main_rx_fifo_do_read) begin
-            main_rx_fifo_level0 <= (main_rx_fifo_level0 - 1'd1);
+        if (main_minimalsoc_tx_fifo_do_read) begin
+            main_minimalsoc_tx_fifo_level0 <= (main_minimalsoc_tx_fifo_level0 - 1'd1);
         end
+    end
+    if (main_minimalsoc_rx_fifo_syncfifo_re) begin
+        main_minimalsoc_rx_fifo_readable <= 1'd1;
+    end else begin
+        if (main_minimalsoc_rx_fifo_re) begin
+            main_minimalsoc_rx_fifo_readable <= 1'd0;
+        end
+    end
+    if (((main_minimalsoc_rx_fifo_syncfifo_we & main_minimalsoc_rx_fifo_syncfifo_writable) & (~main_minimalsoc_rx_fifo_replace))) begin
+        main_minimalsoc_rx_fifo_produce <= (main_minimalsoc_rx_fifo_produce + 1'd1);
+    end
+    if (main_minimalsoc_rx_fifo_do_read) begin
+        main_minimalsoc_rx_fifo_consume <= (main_minimalsoc_rx_fifo_consume + 1'd1);
+    end
+    if (((main_minimalsoc_rx_fifo_syncfifo_we & main_minimalsoc_rx_fifo_syncfifo_writable) & (~main_minimalsoc_rx_fifo_replace))) begin
+        if ((~main_minimalsoc_rx_fifo_do_read)) begin
+            main_minimalsoc_rx_fifo_level0 <= (main_minimalsoc_rx_fifo_level0 + 1'd1);
+        end
+    end else begin
+        if (main_minimalsoc_rx_fifo_do_read) begin
+            main_minimalsoc_rx_fifo_level0 <= (main_minimalsoc_rx_fifo_level0 - 1'd1);
+        end
+    end
+    if (main_timer0_en_storage) begin
+        if ((main_timer0_value == 1'd0)) begin
+            main_timer0_value <= main_timer0_reload_storage;
+        end else begin
+            main_timer0_value <= (main_timer0_value - 1'd1);
+        end
+    end else begin
+        main_timer0_value <= main_timer0_load_storage;
+    end
+    if (main_timer0_update_value_re) begin
+        main_timer0_value_status <= main_timer0_value;
+    end
+    if (main_timer0_zero_clear) begin
+        main_timer0_zero_pending <= 1'd0;
+    end
+    main_timer0_zero_trigger_d <= main_timer0_zero_trigger;
+    if ((main_timer0_zero_trigger & (~main_timer0_zero_trigger_d))) begin
+        main_timer0_zero_pending <= 1'd1;
     end
     builder_wishbone2csr_state <= builder_wishbone2csr_next_state;
     builder_interface0_bank_bus_dat_r <= 1'd0;
@@ -1146,14 +1387,14 @@ always @(posedge sys_clk) begin
         endcase
     end
     if (builder_csrbank0_reset0_re) begin
-        main_reset_storage <= builder_csrbank0_reset0_r;
+        main_minimalsoc_reset_storage <= builder_csrbank0_reset0_r;
     end
-    main_reset_re <= builder_csrbank0_reset0_re;
+    main_minimalsoc_reset_re <= builder_csrbank0_reset0_re;
     if (builder_csrbank0_scratch0_re) begin
-        main_scratch_storage <= builder_csrbank0_scratch0_r;
+        main_minimalsoc_scratch_storage <= builder_csrbank0_scratch0_r;
     end
-    main_scratch_re <= builder_csrbank0_scratch0_re;
-    main_bus_errors_re <= builder_csrbank0_bus_errors_re;
+    main_minimalsoc_scratch_re <= builder_csrbank0_scratch0_re;
+    main_minimalsoc_bus_errors_re <= builder_csrbank0_bus_errors_re;
     builder_interface1_bank_bus_dat_r <= 1'd0;
     if (builder_csrbank1_sel) begin
         case (builder_interface1_bank_bus_adr[8:0])
@@ -1170,7 +1411,7 @@ always @(posedge sys_clk) begin
     if (builder_csrbank2_sel) begin
         case (builder_interface2_bank_bus_adr[8:0])
             1'd0: begin
-                builder_interface2_bank_bus_dat_r <= main_rxtx_w;
+                builder_interface2_bank_bus_dat_r <= main_minimalsoc_rxtx_w;
             end
             1'd1: begin
                 builder_interface2_bank_bus_dat_r <= builder_csrbank2_txfull_w;
@@ -1195,57 +1436,131 @@ always @(posedge sys_clk) begin
             end
         endcase
     end
-    main_txfull_re <= builder_csrbank2_txfull_re;
-    main_rxempty_re <= builder_csrbank2_rxempty_re;
-    main_status_re <= builder_csrbank2_ev_status_re;
+    main_minimalsoc_txfull_re <= builder_csrbank2_txfull_re;
+    main_minimalsoc_rxempty_re <= builder_csrbank2_rxempty_re;
+    main_minimalsoc_status_re <= builder_csrbank2_ev_status_re;
     if (builder_csrbank2_ev_pending_re) begin
-        main_pending_r <= builder_csrbank2_ev_pending_r;
+        main_minimalsoc_pending_r <= builder_csrbank2_ev_pending_r;
     end
-    main_pending_re <= builder_csrbank2_ev_pending_re;
+    main_minimalsoc_pending_re <= builder_csrbank2_ev_pending_re;
     if (builder_csrbank2_ev_enable0_re) begin
-        main_enable_storage <= builder_csrbank2_ev_enable0_r;
+        main_minimalsoc_enable_storage <= builder_csrbank2_ev_enable0_r;
     end
-    main_enable_re <= builder_csrbank2_ev_enable0_re;
-    main_txempty_re <= builder_csrbank2_txempty_re;
-    main_rxfull_re <= builder_csrbank2_rxfull_re;
+    main_minimalsoc_enable_re <= builder_csrbank2_ev_enable0_re;
+    main_minimalsoc_txempty_re <= builder_csrbank2_txempty_re;
+    main_minimalsoc_rxfull_re <= builder_csrbank2_rxfull_re;
+    builder_interface3_bank_bus_dat_r <= 1'd0;
+    if (builder_csrbank3_sel) begin
+        case (builder_interface3_bank_bus_adr[8:0])
+            1'd0: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_load0_w;
+            end
+            1'd1: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_reload0_w;
+            end
+            2'd2: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_en0_w;
+            end
+            2'd3: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_update_value0_w;
+            end
+            3'd4: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_value_w;
+            end
+            3'd5: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_ev_status_w;
+            end
+            3'd6: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_ev_pending_w;
+            end
+            3'd7: begin
+                builder_interface3_bank_bus_dat_r <= builder_csrbank3_ev_enable0_w;
+            end
+        endcase
+    end
+    if (builder_csrbank3_load0_re) begin
+        main_timer0_load_storage <= builder_csrbank3_load0_r;
+    end
+    main_timer0_load_re <= builder_csrbank3_load0_re;
+    if (builder_csrbank3_reload0_re) begin
+        main_timer0_reload_storage <= builder_csrbank3_reload0_r;
+    end
+    main_timer0_reload_re <= builder_csrbank3_reload0_re;
+    if (builder_csrbank3_en0_re) begin
+        main_timer0_en_storage <= builder_csrbank3_en0_r;
+    end
+    main_timer0_en_re <= builder_csrbank3_en0_re;
+    if (builder_csrbank3_update_value0_re) begin
+        main_timer0_update_value_storage <= builder_csrbank3_update_value0_r;
+    end
+    main_timer0_update_value_re <= builder_csrbank3_update_value0_re;
+    main_timer0_value_re <= builder_csrbank3_value_re;
+    main_timer0_status_re <= builder_csrbank3_ev_status_re;
+    if (builder_csrbank3_ev_pending_re) begin
+        main_timer0_pending_r <= builder_csrbank3_ev_pending_r;
+    end
+    main_timer0_pending_re <= builder_csrbank3_ev_pending_re;
+    if (builder_csrbank3_ev_enable0_re) begin
+        main_timer0_enable_storage <= builder_csrbank3_ev_enable0_r;
+    end
+    main_timer0_enable_re <= builder_csrbank3_ev_enable0_re;
     if (sys_rst) begin
-        main_reset_storage <= 2'd0;
-        main_reset_re <= 1'd0;
-        main_scratch_storage <= 32'd305419896;
-        main_scratch_re <= 1'd0;
-        main_bus_errors_re <= 1'd0;
-        main_bus_errors <= 32'd0;
-        main_idbus_we <= 1'd0;
-        main_mbus_rdata1 <= 32'd0;
-        main_ram_bus_ack <= 1'd0;
+        main_minimalsoc_reset_storage <= 2'd0;
+        main_minimalsoc_reset_re <= 1'd0;
+        main_minimalsoc_scratch_storage <= 32'd305419896;
+        main_minimalsoc_scratch_re <= 1'd0;
+        main_minimalsoc_bus_errors_re <= 1'd0;
+        main_minimalsoc_bus_errors <= 32'd0;
+        main_minimalsoc_idbus_we <= 1'd0;
+        main_minimalsoc_mbus_rdata1 <= 32'd0;
+        main_minimalsoc_minimalsoc_ram_bus_ack <= 1'd0;
+        main_minimalsoc_ram_bus_ram_bus_ack <= 1'd0;
         serial_tx <= 1'd1;
-        main_tx_tick <= 1'd0;
-        main_rx_tick <= 1'd0;
-        main_rx_rx_d <= 1'd0;
-        main_txfull_re <= 1'd0;
-        main_rxempty_re <= 1'd0;
-        main_tx_pending <= 1'd0;
-        main_tx_trigger_d <= 1'd0;
-        main_rx_pending <= 1'd0;
-        main_rx_trigger_d <= 1'd0;
-        main_status_re <= 1'd0;
-        main_pending_re <= 1'd0;
-        main_pending_r <= 2'd0;
-        main_enable_storage <= 2'd0;
-        main_enable_re <= 1'd0;
-        main_txempty_re <= 1'd0;
-        main_rxfull_re <= 1'd0;
-        main_tx_fifo_readable <= 1'd0;
-        main_tx_fifo_level0 <= 5'd0;
-        main_tx_fifo_produce <= 4'd0;
-        main_tx_fifo_consume <= 4'd0;
-        main_rx_fifo_readable <= 1'd0;
-        main_rx_fifo_level0 <= 5'd0;
-        main_rx_fifo_produce <= 4'd0;
-        main_rx_fifo_consume <= 4'd0;
+        main_minimalsoc_tx_tick <= 1'd0;
+        main_minimalsoc_rx_tick <= 1'd0;
+        main_minimalsoc_rx_rx_d <= 1'd0;
+        main_minimalsoc_txfull_re <= 1'd0;
+        main_minimalsoc_rxempty_re <= 1'd0;
+        main_minimalsoc_tx_pending <= 1'd0;
+        main_minimalsoc_tx_trigger_d <= 1'd0;
+        main_minimalsoc_rx_pending <= 1'd0;
+        main_minimalsoc_rx_trigger_d <= 1'd0;
+        main_minimalsoc_status_re <= 1'd0;
+        main_minimalsoc_pending_re <= 1'd0;
+        main_minimalsoc_pending_r <= 2'd0;
+        main_minimalsoc_enable_storage <= 2'd0;
+        main_minimalsoc_enable_re <= 1'd0;
+        main_minimalsoc_txempty_re <= 1'd0;
+        main_minimalsoc_rxfull_re <= 1'd0;
+        main_minimalsoc_tx_fifo_readable <= 1'd0;
+        main_minimalsoc_tx_fifo_level0 <= 5'd0;
+        main_minimalsoc_tx_fifo_produce <= 4'd0;
+        main_minimalsoc_tx_fifo_consume <= 4'd0;
+        main_minimalsoc_rx_fifo_readable <= 1'd0;
+        main_minimalsoc_rx_fifo_level0 <= 5'd0;
+        main_minimalsoc_rx_fifo_produce <= 4'd0;
+        main_minimalsoc_rx_fifo_consume <= 4'd0;
         main_storage <= 3'd0;
         main_re <= 1'd0;
-        builder_slave_sel_r <= 2'd0;
+        main_timer0_load_storage <= 32'd0;
+        main_timer0_load_re <= 1'd0;
+        main_timer0_reload_storage <= 32'd0;
+        main_timer0_reload_re <= 1'd0;
+        main_timer0_en_storage <= 1'd0;
+        main_timer0_en_re <= 1'd0;
+        main_timer0_update_value_storage <= 1'd0;
+        main_timer0_update_value_re <= 1'd0;
+        main_timer0_value_status <= 32'd0;
+        main_timer0_value_re <= 1'd0;
+        main_timer0_zero_pending <= 1'd0;
+        main_timer0_zero_trigger_d <= 1'd0;
+        main_timer0_status_re <= 1'd0;
+        main_timer0_pending_re <= 1'd0;
+        main_timer0_pending_r <= 1'd0;
+        main_timer0_enable_storage <= 1'd0;
+        main_timer0_enable_re <= 1'd0;
+        main_timer0_value <= 32'd0;
+        builder_slave_sel_r <= 3'd0;
         builder_count <= 20'd1000000;
         builder_femtorv_state <= 1'd0;
         builder_rs232phytx_state <= 1'd0;
@@ -1262,18 +1577,41 @@ end
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Memory rom: 3034-words x 32-bit
+// Memory rom: 71-words x 32-bit
 //------------------------------------------------------------------------------
 // Port 0 | Read: Sync  | Write: ---- | 
-reg [31:0] rom[0:3033];
+reg [31:0] rom[0:70];
 initial begin
 	$readmemh("vsd_mini_fpga_rom.init", rom);
 end
 reg [31:0] rom_dat0;
 always @(posedge sys_clk) begin
-	rom_dat0 <= rom[main_adr];
+	rom_dat0 <= rom[main_minimalsoc_minimalsoc_adr];
 end
-assign main_dat_r = rom_dat0;
+assign main_minimalsoc_minimalsoc_dat_r = rom_dat0;
+
+
+//------------------------------------------------------------------------------
+// Memory main_ram: 2048-words x 32-bit
+//------------------------------------------------------------------------------
+// Port 0 | Read: Sync  | Write: Sync | Mode: Write-First | Write-Granularity: 8 
+reg [31:0] main_ram[0:2047];
+initial begin
+	$readmemh("vsd_mini_fpga_main_ram.init", main_ram);
+end
+reg [10:0] main_ram_adr0;
+always @(posedge sys_clk) begin
+	if (main_minimalsoc_ram_we[0])
+		main_ram[main_minimalsoc_ram_adr][7:0] <= main_minimalsoc_ram_dat_w[7:0];
+	if (main_minimalsoc_ram_we[1])
+		main_ram[main_minimalsoc_ram_adr][15:8] <= main_minimalsoc_ram_dat_w[15:8];
+	if (main_minimalsoc_ram_we[2])
+		main_ram[main_minimalsoc_ram_adr][23:16] <= main_minimalsoc_ram_dat_w[23:16];
+	if (main_minimalsoc_ram_we[3])
+		main_ram[main_minimalsoc_ram_adr][31:24] <= main_minimalsoc_ram_dat_w[31:24];
+	main_ram_adr0 <= main_minimalsoc_ram_adr;
+end
+assign main_minimalsoc_ram_dat_r = main_ram[main_ram_adr0];
 
 
 //------------------------------------------------------------------------------
@@ -1285,16 +1623,16 @@ reg [9:0] storage[0:15];
 reg [9:0] storage_dat0;
 reg [9:0] storage_dat1;
 always @(posedge sys_clk) begin
-	if (main_tx_fifo_wrport_we)
-		storage[main_tx_fifo_wrport_adr] <= main_tx_fifo_wrport_dat_w;
-	storage_dat0 <= storage[main_tx_fifo_wrport_adr];
+	if (main_minimalsoc_tx_fifo_wrport_we)
+		storage[main_minimalsoc_tx_fifo_wrport_adr] <= main_minimalsoc_tx_fifo_wrport_dat_w;
+	storage_dat0 <= storage[main_minimalsoc_tx_fifo_wrport_adr];
 end
 always @(posedge sys_clk) begin
-	if (main_tx_fifo_rdport_re)
-		storage_dat1 <= storage[main_tx_fifo_rdport_adr];
+	if (main_minimalsoc_tx_fifo_rdport_re)
+		storage_dat1 <= storage[main_minimalsoc_tx_fifo_rdport_adr];
 end
-assign main_tx_fifo_wrport_dat_r = storage_dat0;
-assign main_tx_fifo_rdport_dat_r = storage_dat1;
+assign main_minimalsoc_tx_fifo_wrport_dat_r = storage_dat0;
+assign main_minimalsoc_tx_fifo_rdport_dat_r = storage_dat1;
 
 
 //------------------------------------------------------------------------------
@@ -1306,16 +1644,16 @@ reg [9:0] storage_1[0:15];
 reg [9:0] storage_1_dat0;
 reg [9:0] storage_1_dat1;
 always @(posedge sys_clk) begin
-	if (main_rx_fifo_wrport_we)
-		storage_1[main_rx_fifo_wrport_adr] <= main_rx_fifo_wrport_dat_w;
-	storage_1_dat0 <= storage_1[main_rx_fifo_wrport_adr];
+	if (main_minimalsoc_rx_fifo_wrport_we)
+		storage_1[main_minimalsoc_rx_fifo_wrport_adr] <= main_minimalsoc_rx_fifo_wrport_dat_w;
+	storage_1_dat0 <= storage_1[main_minimalsoc_rx_fifo_wrport_adr];
 end
 always @(posedge sys_clk) begin
-	if (main_rx_fifo_rdport_re)
-		storage_1_dat1 <= storage_1[main_rx_fifo_rdport_adr];
+	if (main_minimalsoc_rx_fifo_rdport_re)
+		storage_1_dat1 <= storage_1[main_minimalsoc_rx_fifo_rdport_adr];
 end
-assign main_rx_fifo_wrport_dat_r = storage_1_dat0;
-assign main_rx_fifo_rdport_dat_r = storage_1_dat1;
+assign main_minimalsoc_rx_fifo_wrport_dat_r = storage_1_dat0;
+assign main_minimalsoc_rx_fifo_rdport_dat_r = storage_1_dat1;
 
 
 //------------------------------------------------------------------------------
@@ -1328,20 +1666,20 @@ FemtoRV32 #(
 ) FemtoRV32 (
 	// Inputs.
 	.clk       (sys_clk),
-	.mem_rbusy (main_mbus_rbusy),
-	.mem_rdata (main_mbus_rdata0),
-	.mem_wbusy (main_mbus_wbusy),
-	.reset     ((~(sys_rst | main_reset))),
+	.mem_rbusy (main_minimalsoc_mbus_rbusy),
+	.mem_rdata (main_minimalsoc_mbus_rdata0),
+	.mem_wbusy (main_minimalsoc_mbus_wbusy),
+	.reset     ((~(sys_rst | main_minimalsoc_reset))),
 
 	// Outputs.
-	.mem_addr  (main_mbus_addr),
-	.mem_rstrb (main_mbus_rstrb),
-	.mem_wdata (main_mbus_wdata),
-	.mem_wmask (main_mbus_wmask)
+	.mem_addr  (main_minimalsoc_mbus_addr),
+	.mem_rstrb (main_minimalsoc_mbus_rstrb),
+	.mem_wdata (main_minimalsoc_mbus_wdata),
+	.mem_wmask (main_minimalsoc_mbus_wmask)
 );
 
 endmodule
 
 // -----------------------------------------------------------------------------
-//  Auto-Generated by LiteX on 2025-07-14 18:59:22.
+//  Auto-Generated by LiteX on 2025-07-16 14:23:44.
 //------------------------------------------------------------------------------
