@@ -3844,8 +3844,8 @@ ABC: + &if -W 250 -v
 ABC: K = 4. Memory (bytes): Truth =    0. Cut =   52. Obj =  136. Set =  564. CutMin = no
 ABC: Node =    5953.  Ch =   812.  Total mem =    2.36 MB. Peak cut mem =    0.11 MB.
 ABC: P:  Del = 9415.00.  Ar =    1754.0.  Edge =     6232.  Cut =    34124.  T =     0.00 sec
-ABC: P:  Del = 9415.00.  Ar =    1686.0.  Edge =     6142.  Cut =    32622.  T =     0.00 sec
-ABC: P:  Del = 9415.00.  Ar =    1477.0.  Edge =     5111.  Cut =    34968.  T =     0.00 sec
+ABC: P:  Del = 9415.00.  Ar =    1686.0.  Edge =     6142.  Cut =    32622.  T =     0.01 sec
+ABC: P:  Del = 9415.00.  Ar =    1477.0.  Edge =     5111.  Cut =    34968.  T =     0.01 sec
 ABC: F:  Del = 9415.00.  Ar =    1407.0.  Edge =     4938.  Cut =    34579.  T =     0.00 sec
 ABC: A:  Del = 9415.00.  Ar =    1373.0.  Edge =     4702.  Cut =    35205.  T =     0.01 sec
 ABC: A:  Del = 9415.00.  Ar =    1367.0.  Edge =     4689.  Cut =    35147.  T =     0.01 sec
@@ -3859,7 +3859,7 @@ ABC: levB =   21  mem = 0.08 MB
 ABC: LUT = 1364 : 2=173 12.7 %  3=436 32.0 %  4=755 55.4 %  Ave = 3.43
 ABC: + &write -n <abc-temp-dir>/output.aig 
 ABC: + time 
-ABC: elapse: 0.62 seconds, total: 0.62 seconds
+ABC: elapse: 0.59 seconds, total: 0.59 seconds
 
 4.48.15.6. Executing AIGER frontend.
 <suppressed ~6454 debug messages>
@@ -4253,6 +4253,6 @@ Found and reported 0 problems.
 
 5. Executing JSON backend.
 
-End of script. Logfile hash: 89ceff2a5a, CPU: user 3.18s system 0.04s, MEM: 73.95 MB peak
+End of script. Logfile hash: 225767eba6, CPU: user 3.21s system 0.03s, MEM: 73.76 MB peak
 Yosys 0.55+8 (git sha1 9334a5c27, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)
-Time spent: 17% 12x techmap (0 sec), 16% 1x abc9_exe (0 sec), ...
+Time spent: 16% 1x abc9_exe (0 sec), 16% 12x techmap (0 sec), ...

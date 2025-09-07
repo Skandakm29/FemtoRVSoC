@@ -29,7 +29,7 @@ class MinimalSoC(SoCMini):
             cpu_type="femtorv",
             cpu_variant="quark",
             cpu_reset_address=0x00000000,
-            integrated_rom_init="firmware/firmware.hex",  # 👈 load your hex here
+            integrated_rom_init="firmware/firmware.hex",  #  load your hex here
             integrated_rom_size=0x4000,  # 16 KB ROM
             integrated_main_ram_size=0x2000  # 8 KB RAM
         )
